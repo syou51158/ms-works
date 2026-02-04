@@ -1,0 +1,22 @@
+name: Debug Native SSH
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/debug_native_ssh.yml'
+
+jobs:
+  debug-ssh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔑 Setup SSH Key and Test Connection
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SFTP_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p 2222 -H ${{ secrets.SFTP_SERVER }} >> ~/.ssh/known_hosts
+          
+          echo "=== TESTING SSH CONNECTION ==="
+          ssh -v -p 2222 -i ~/.ssh/id_rsa ${{ secrets.SFTP_USERNAME }}@${{ secrets.SFTP_SERVER }} "pwd && ls -la && echo 'Checking web/ms-works-kyoto:' && ls -la web/ms-works-kyoto"
