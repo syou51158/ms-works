@@ -1,83 +1,126 @@
-# Database Instructions for External AI Agents
+# データベース連携指示書 (AIエージェント用)
 
-This document provides instructions on how to interact with the **M'S Works** Supabase database. This project uses PostgreSQL.
+このドキュメントは、他のAIエージェントや開発者が M'S Works のSupabaseデータベースを操作するための仕様書です。
 
-## Table Schemas
-
-### 1. `news` (お知らせ)
-Used for company news and updates.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `BIGINT` (PK) | `IDENTITY` | Unique identifier |
-| `created_at` | `TIMESTAMPTZ` | `NOW()` | Creation timestamp |
-| `title` | `TEXT` | - | **Required**. The title of the news article |
-| `content` | `TEXT` | `NULL` | The body content of the article |
-| `published_at` | `DATE` | `NULL` | Public display date |
-| `category` | `TEXT` | `'お知らせ'` | e.g. 'お知らせ', '施工実績', 'その他' |
-| `is_published` | `BOOLEAN` | `TRUE` | Whether the post is visible publically |
-
-### 2. `works` (施工実績)
-Used for displaying construction project portfolios.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `BIGINT` (PK) | `IDENTITY` | Unique identifier |
-| `created_at` | `TIMESTAMPTZ` | `NOW()` | Creation timestamp |
-| `title` | `TEXT` | - | **Required**. Project title |
-| `location` | `TEXT` | `NULL` | Project location (e.g. 'Kyoto City') |
-| `description` | `TEXT` | `NULL` | Details about the project |
-| `image_url` | `TEXT` | `NULL` | Full URL to the main image |
-| `completion_date` | `DATE` | `NULL` | When the project was finished |
+## 基本情報
+- **プラットフォーム**: Supabase (PostgreSQL)
+- **認証**: データの読み書きには適切なAPIキー（`anon` または `service_role`）が必要です。
+- **セキュリティ**: すべてのテーブルで RLS (Row Level Security) が有効化されています。
 
 ---
 
-## Common SQL Operations
+## テーブル定義 (Schema)
 
-### INSERT - Adding Data
-**Add a new News item:**
-```sql
-INSERT INTO public.news (title, content, published_at, category)
-VALUES ('New Office Opening', 'We have moved to a new location...', CURRENT_DATE, 'お知らせ');
-```
+### 1. お知らせ (`news`)
+ウェブサイトの「お知らせ」セクションに表示される記事データです。
 
-**Add a new Work item:**
-```sql
-INSERT INTO public.works (title, location, description, image_url)
-VALUES ('Renovation Project A', 'Kyoto, Japan', 'Full interior renovation...', 'https://example.com/image.jpg');
-```
+| カラム名 | 型 | 説明 |
+| :--- | :--- | :--- |
+| `id` | `bigint` (PK) | 一意のID (自動生成) |
+| `created_at` | `timestamptz` | 作成日時 (デフォルト: NOW) |
+| `title` | `text` | 記事のタイトル |
+| `content` | `text` | 記事の本文 |
+| `published_at` | `date` | 公開日 |
+| `category` | `text` | カテゴリ (例: 'お知らせ', '重要') |
+| `is_published` | `boolean` | 公開フラグ (true: 公開, false: 下書き) |
 
-### SELECT - Retrieving Data
-**Get the latest 5 news items:**
+### 2. 施工実績 (`works`)
+「施工実績」ページに表示される事例データです。
+
+| カラム名 | 型 | 説明 |
+| :--- | :--- | :--- |
+| `id` | `bigint` (PK) | 一意のID (自動生成) |
+| `created_at` | `timestamptz` | 作成日時 |
+| `title` | `text` | 施工事例のタイトル |
+| `description` | `text` | 施工内容の詳細説明 |
+| `image_url` | `text` | 画像のURL |
+| `location` | `text` | 施工場所 (県・市など) |
+| `completion_date` | `date` | 完工日 |
+
+### 3. 見積もり依頼 (`estimates`) [CRM]
+見積もりフォームから送信された顧客の詳細な依頼データです。
+
+| カラム名 | 型 | 説明 |
+| :--- | :--- | :--- |
+| `id` | `bigint` (PK) | 一意のID |
+| `created_at` | `timestamptz` | 作成日時 |
+| `work_type` | `text` | 工事の種類 |
+| `building_type` | `text` | 建物の種類 |
+| `floors` | `text` | 階数 |
+| `structure` | `text` | 構造 |
+| `area` | `text` | 延床面積 |
+| `timing` | `text` | 希望時期 |
+| `prefecture` | `text` | 都道府県 |
+| `city` | `text` | 市区町村 |
+| `name` | `text` | 顧客氏名 |
+| `email` | `text` | メールアドレス |
+| `phone` | `text` | 電話番号 |
+| `status` | `text` | ステータス (pending, replied, done 等) |
+
+### 4. お問い合わせ (`inquiries`) [CRM]
+お問い合わせフォームから送信されたメッセージデータです。
+
+| カラム名 | 型 | 説明 |
+| :--- | :--- | :--- |
+| `id` | `bigint` (PK) | 一意のID |
+| `created_at` | `timestamptz` | 作成日時 |
+| `name` | `text` | 顧客氏名 |
+| `email` | `text` | メールアドレス |
+| `phone` | `text` | 電話番号 |
+| `subject` | `text` | 件名 |
+| `message` | `text` | お問い合わせ内容 |
+| `is_recruitment`| `boolean` | 採用応募フラグ |
+| `status` | `text` | ステータス (unread, replied, done) |
+
+### 5. SEO設定 (`seo_settings`) [Settings]
+各ページのSEOメタデータ（タイトル、説明文、OGP画像）を管理するテーブルです。
+
+| カラム名 | 型 | 説明 |
+| :--- | :--- | :--- |
+| `id` | `bigint` (PK) | 一意のID |
+| `page_path` | `text` | ページのパス (例: /about, /news) - ユニーク制約 |
+| `title` | `text` | HTMLタイトルタグ |
+| `description` | `text` | meta description |
+| `og_image_url` | `text` | OGP画像のURL |
+| `updated_at` | `timestamptz` | 最終更新日時 |
+
+---
+
+## SQL操作例 (Command Examples)
+
+AIエージェントがデータベースを操作する際に使用できるSQLの例です。
+
+### データの取得 (Select)
+
 ```sql
-SELECT title, published_at FROM public.news 
-WHERE is_published = TRUE 
+-- SEO設定の取得
+SELECT * FROM seo_settings WHERE page_path = '/about';
+
+-- 最新のニュースを5件取得
+SELECT * FROM news 
+WHERE is_published = true 
 ORDER BY published_at DESC 
 LIMIT 5;
+
+-- 未読のお問い合わせを取得
+SELECT * FROM inquiries 
+WHERE status = 'unread' 
+ORDER BY created_at DESC;
 ```
 
-**Get works in a specific location:**
+### データの追加 (Insert)
+
 ```sql
-SELECT * FROM public.works 
-WHERE location ILIKE '%Kyoto%';
+-- ニュースの追加
+INSERT INTO news (title, content, published_at, category)
+VALUES ('冬季休業のお知らせ', '年末年始は...', '2024-12-01', 'お知らせ');
 ```
 
-### UPDATE - Modifying Data
-**Update a news title:**
+### データの更新 (Update)
+
 ```sql
-UPDATE public.news 
-SET title = 'Updated Title' 
-WHERE id = 1;
+-- お問い合わせを「既読(replied)」にする
+UPDATE inquiries 
+SET status = 'replied' 
+WHERE id = 123;
 ```
-
-### DELETE - Removing Data
-**Delete a specific work item:**
-```sql
-DELETE FROM public.works 
-WHERE id = 10;
-```
-
-## Security & RLS
-- **Public Read Access**: Both `news` and `works` tables are readable by anyone (including unauthenticated users).
-- **Admin Write Access**: Only authenticated users (`auth.role() = 'authenticated'`) can INSERT, UPDATE, or DELETE rows.
-- **External Access**: If you are an external agent writing to this DB, ensure you are using the `service_role` key or an authenticated user token with appropriate permissions.

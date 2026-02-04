@@ -16,6 +16,7 @@ import AdminNews from './pages/admin/News';
 import AdminWorks from './pages/admin/Works';
 import AdminInquiries from './pages/admin/Inquiries';
 import AdminEstimates from './pages/admin/Estimates';
+import AdminSeo from './pages/admin/Seo';
 import Estimate from './pages/Estimate';
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
                 <Route path="estimates" element={<AdminEstimates />} />
                 <Route path="news" element={<AdminNews />} />
                 <Route path="works" element={<AdminWorks />} />
+                <Route path="seo" element={<AdminSeo />} />
             </Route>
         </Routes>
     );

@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import SeoHead from './SeoHead';
 
 export default function Layout() {
     const { pathname } = useLocation();
@@ -13,6 +14,7 @@ export default function Layout() {
 
     return (
         <>
+            <SeoHead />
             <Header />
             <main style={{ paddingTop: 'var(--header-height)' }}>
                 <Outlet />
