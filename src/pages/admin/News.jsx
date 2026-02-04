@@ -153,7 +153,8 @@ export default function AdminNews() {
                 </div>
             )}
 
-            <div className="bg-white rounded shadow scrollbar-hide overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded shadow scrollbar-hide overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-gray-50 border-b">
@@ -189,6 +190,39 @@ export default function AdminNews() {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+                {loading ? (
+                    <p className="text-center text-gray-500">読み込み中...</p>
+                ) : news.length === 0 ? (
+                    <p className="text-center text-gray-500">データがありません</p>
+                ) : (
+                    news.map((item) => (
+                        <div key={item.id} className="bg-white p-4 rounded shadow border border-gray-100">
+                            <div className="flex justify-between items-start mb-2">
+                                <span className="text-sm text-gray-500">{item.published_at}</span>
+                                <span className="px-2 py-1 text-xs rounded bg-gray-200 text-gray-700">{item.category}</span>
+                            </div>
+                            <h3 className="font-bold text-gray-800 mb-4">{item.title}</h3>
+                            <div className="flex justify-end gap-3 pt-3 border-t border-gray-50">
+                                <button
+                                    onClick={() => handleEdit(item)}
+                                    className="flex items-center gap-1 text-blue-600 text-sm font-medium"
+                                >
+                                    <Edit size={16} /> 編集
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(item.id)}
+                                    className="flex items-center gap-1 text-red-600 text-sm font-medium"
+                                >
+                                    <Trash2 size={16} /> 削除
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );

@@ -189,7 +189,8 @@ export default function AdminWorks() {
                 </div>
             )}
 
-            <div className="bg-white rounded shadow scrollbar-hide overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded shadow scrollbar-hide overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-gray-50 border-b">
@@ -229,6 +230,46 @@ export default function AdminWorks() {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+                {loading ? (
+                    <p className="text-center text-gray-500">読み込み中...</p>
+                ) : works.length === 0 ? (
+                    <p className="text-center text-gray-500">データがありません</p>
+                ) : (
+                    works.map((item) => (
+                        <div key={item.id} className="bg-white p-4 rounded shadow border border-gray-100 flex gap-4">
+                            <div className="flex-shrink-0">
+                                {item.image_url ? (
+                                    <img src={item.image_url} alt={item.title} className="h-20 w-20 object-cover rounded" />
+                                ) : (
+                                    <div className="h-20 w-20 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-400">No Image</div>
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-bold text-gray-800 truncate mb-1">{item.title}</h3>
+                                <p className="text-sm text-gray-500 mb-3 flex items-center gap-1">📍 {item.location || '場所未設定'}</p>
+
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => handleEdit(item)}
+                                        className="flex items-center gap-1 text-blue-600 text-sm font-medium"
+                                    >
+                                        <Edit size={16} /> 編集
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(item.id)}
+                                        className="flex items-center gap-1 text-red-600 text-sm font-medium"
+                                    >
+                                        <Trash2 size={16} /> 削除
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );
