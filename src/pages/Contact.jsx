@@ -6,7 +6,7 @@ export default function Contact() {
             <PageHeader
                 title="お問い合わせ"
                 subtitle="CONTACT"
-                image="/assets/images/header_contact.png"
+                image="/assets/images/header_contact_clean_v2.png"
             />
 
             <section className="section">
