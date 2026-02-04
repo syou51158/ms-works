@@ -5,6 +5,8 @@ import { ArrowRight, ChevronDown } from 'lucide-react';
 
 export default function Home() {
     const [offset, setOffset] = useState(0);
+    const [news, setNews] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const handleScroll = () => {
