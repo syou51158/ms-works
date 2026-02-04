@@ -1,7 +1,7 @@
 import { Outlet, Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { LogOut, Home, FileText, Briefcase, Menu, X } from 'lucide-react';
+import { LogOut, Home, FileText, Briefcase, Menu, X, Mail, Calculator } from 'lucide-react';
 
 export default function AdminLayout() {
     const [session, setSession] = useState(null);
@@ -82,6 +82,13 @@ export default function AdminLayout() {
                     <Link to="/admin" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
                         <Home size={20} /> ダッシュボード
                     </Link>
+                    <Link to="/admin/inquiries" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                        <Mail size={20} /> お問い合わせ
+                    </Link>
+                    <Link to="/admin/estimates" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                        <Calculator size={20} /> 見積もり依頼
+                    </Link>
+                    <div className="my-2 border-t border-gray-100"></div>
                     <Link to="/admin/news" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
                         <FileText size={20} /> お知らせ管理
                     </Link>

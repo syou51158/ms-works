@@ -14,6 +14,8 @@ import Dashboard from './pages/admin/Dashboard';
 import Signup from './pages/admin/Signup';
 import AdminNews from './pages/admin/News';
 import AdminWorks from './pages/admin/Works';
+import AdminInquiries from './pages/admin/Inquiries';
+import AdminEstimates from './pages/admin/Estimates';
 import Estimate from './pages/Estimate';
 
 function App() {
@@ -39,6 +41,8 @@ function App() {
             {/* Admin Protected Routes */}
             <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<Dashboard />} />
+                <Route path="inquiries" element={<AdminInquiries />} />
+                <Route path="estimates" element={<AdminEstimates />} />
                 <Route path="news" element={<AdminNews />} />
                 <Route path="works" element={<AdminWorks />} />
             </Route>

@@ -121,3 +121,8 @@ dist
 static_backup/
 仮のページ/
 .DS_Store
+
+# Deployment Keys
+github_actions_key
+github_actions_key.pub
+lolipop_key_pem

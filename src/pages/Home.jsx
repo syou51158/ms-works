@@ -4,8 +4,15 @@ import { supabase } from '../lib/supabase';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 
 export default function Home() {
-    const [news, setNews] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [offset, setOffset] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setOffset(window.scrollY);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useEffect(() => {
         fetchNews();
@@ -53,10 +60,21 @@ export default function Home() {
     return (
         <div className="font-sans">
             {/* Hero Section */}
-            <section className="relative h-screen flex items-center justify-center overflow-hidden parallax" style={{
-                backgroundImage: "url('/assets/images/hero_modern_construction.png')",
-            }}>
-                <div className="absolute inset-0 bg-black/40" /> {/* Overlay using Tailwind opacity */}
+            <section className="relative h-screen flex items-center justify-center overflow-hidden">
+                {/* Parallax Background */}
+                <div
+                    className="absolute inset-0 z-0"
+                    style={{
+                        backgroundImage: "url('/assets/images/hero_modern_construction.png')",
+                        backgroundPosition: 'center',
+                        backgroundSize: 'cover',
+                        backgroundRepeat: 'no-repeat',
+                        transform: `translateY(${offset * 0.5}px)`,
+                        willChange: 'transform'
+                    }}
+                />
+
+                <div className="absolute inset-0 bg-black/40 z-0" /> {/* Overlay using Tailwind opacity */}
 
                 <div className="container relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 h-full items-center">
                     <div className="text-white hidden md:block">

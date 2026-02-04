@@ -352,13 +352,7 @@ img {
     letter-spacing: 0.2rem;
 }
 
-/* Parallax Effect */
-.parallax {
-    background-attachment: fixed;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
+
 
 /* Card Hover Effects */
 .card-hover {
