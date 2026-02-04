@@ -6,7 +6,7 @@ export default function Service() {
             <PageHeader
                 title="事業案内"
                 subtitle="OUR SERVICES"
-                image="/assets/images/header_service.png"
+                image="/assets/images/header_service_clean_v2.png"
             />
 
             <section className="section">

@@ -6,7 +6,7 @@ export default function About() {
             <PageHeader
                 title="会社情報"
                 subtitle="WHO WE ARE"
-                image="/assets/images/header_about.png"
+                image="/assets/images/header_about_clean_v2.png"
             />
 
             <section className="section">

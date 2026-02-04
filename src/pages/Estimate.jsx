@@ -126,7 +126,7 @@ export default function Estimate() {
                 <PageHeader
                     title="お見積もり"
                     subtitle="ESTIMATE"
-                    image="/assets/images/header_contact.png"
+                    image="/assets/images/header_estimate_clean_v2.png"
                 />
                 <section className="section">
                     <div className="container" style={{ maxWidth: '800px', textAlign: 'center', padding: '80px 20px' }}>
@@ -153,7 +153,7 @@ export default function Estimate() {
             <PageHeader
                 title="お見積もり"
                 subtitle="ESTIMATE"
-                image="/assets/images/header_contact.png"
+                image="/assets/images/header_estimate_clean_v2.png"
             />
 
             <section className="section" style={{ background: '#f8f9fa' }}>

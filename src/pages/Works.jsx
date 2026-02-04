@@ -31,7 +31,7 @@ export default function Works() {
             <PageHeader
                 title="施工実績"
                 subtitle="WORKS"
-                image="/assets/images/header_works.png"
+                image="/assets/images/header_works_clean_v2.png"
             />
 
             <section className="section">

@@ -28,7 +28,7 @@ export default function News() {
             <PageHeader
                 title="お知らせ"
                 subtitle="NEWS & TOPICS"
-                image="/assets/images/header_news.png"
+                image="/assets/images/header_news_clean_v2.png"
             />
 
             <section className="section">

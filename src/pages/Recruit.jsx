@@ -7,7 +7,7 @@ export default function Recruit() {
             <PageHeader
                 title="採用情報"
                 subtitle="RECRUITMENT"
-                image="/assets/images/header_recruit.png"
+                image="/assets/images/header_recruit_clean_v2.png"
             />
 
             <section className="section">
