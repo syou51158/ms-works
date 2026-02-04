@@ -2,30 +2,49 @@ import React, { useEffect, useState } from 'react';
 
 const PageHeader = ({ title, subtitle, image, height = '40vh' }) => {
     const [isVisible, setIsVisible] = useState(false);
+    const [offset, setOffset] = useState(0);
 
     useEffect(() => {
         setIsVisible(true);
-    }, []);
 
-    // Ensure parallax works for these new elements if purely CSS implementation isn't enough
-    // But since .parallax class does background-attachment: fixed, it should work automatically
+        const handleScroll = () => {
+            setOffset(window.pageYOffset);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     return (
         <div
-            className="relative flex items-center justify-center overflow-hidden parallax"
+            className="relative flex items-center justify-center overflow-hidden"
             style={{
                 height: height,
                 minHeight: '400px',
-                backgroundImage: `url('${image}')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundColor: '#0A246A' // Fallback color
+                backgroundColor: '#0A246A' // Fallback
             }}
         >
-            {/* Premium Dark Overlay with Sophisticated Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0A246A]/50 via-[#0A246A]/30 to-black/80" />
+            {/* Parallax Background Image */}
+            <div
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '110%', // Slightly taller to ensure coverage
+                    backgroundImage: `url('${image}')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    transform: `translateY(${offset * 0.4}px)`, // Parallax speed
+                    willChange: 'transform',
+                    zIndex: 0
+                }}
+            />
 
-            <div className={`relative z-10 text-center text-white px-6 py-12 fade-in-up ${isVisible ? 'visible' : ''}`}>
+            {/* Premium Dark Overlay with Sophisticated Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0A246A]/50 via-[#0A246A]/30 to-black/80 z-10" />
+
+            <div className={`relative z-20 text-center text-white px-6 py-12 fade-in-up ${isVisible ? 'visible' : ''}`}>
                 <p
                     className="text-accent font-bold tracking-[0.4em] mb-4 uppercase text-xs md:text-sm"
                     style={{
