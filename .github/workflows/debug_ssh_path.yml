@@ -1,0 +1,29 @@
+name: Debug SSH Path
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/debug_ssh_path.yml'
+
+jobs:
+  debug-path:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔍 Check Remote Directory Structure
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SFTP_SERVER }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          key: ${{ secrets.SFTP_SSH_KEY }}
+          port: 2222
+          script: |
+            echo "=== CURRENT DIRECTORY ==="
+            pwd
+            echo "=== LIST FILES (Level 1) ==="
+            ls -la
+            echo "=== CHECKING 'web' FOLDER ==="
+            ls -la web/ || echo "web folder not found"
+            echo "=== SEARCHING FOR 'ms-works-kyoto' ==="
+            find . -name "ms-works-kyoto" -type d -maxdepth 3
