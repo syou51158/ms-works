@@ -25,14 +25,13 @@ jobs:
       - name: 🏗️ Build project
         run: npm run build
 
-      - name: 📂 Sync files
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: 🚀 Deploy via SCP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.SFTP_SERVER }}
+          host: ${{ secrets.SFTP_SERVER }}
           username: ${{ secrets.SFTP_USERNAME }}
-          ssh_private_key: ${{ secrets.SFTP_SSH_KEY }}
+          key: ${{ secrets.SFTP_SSH_KEY }}
           port: 2222
-          local_path: './dist/'
-          remote_path: './'
-          sftp_only: true
-          delete_remote_files: false
+          source: "dist/*"
+          target: "web/ms-works-kyoto"
+          strip_components: 1
