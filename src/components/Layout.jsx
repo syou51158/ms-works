@@ -14,7 +14,7 @@ export default function Layout() {
     return (
         <>
             <Header />
-            <main>
+            <main style={{ paddingTop: 'var(--header-height)' }}>
                 <Outlet />
             </main>
             <Footer />

@@ -36,8 +36,12 @@ export default function Service() {
                                 <li>部分解体・内装解体</li>
                             </ul>
                         </div>
-                        <div style={{ flex: 1, minWidth: '300px', backgroundColor: '#ddd', minHeight: '300px' }}>
-                            <div style={{ width: '100%', height: '100%', background: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>木造解体イメージ</div>
+                        <div style={{ flex: 1, minWidth: '300px', height: '400px', overflow: 'hidden' }}>
+                            <img
+                                src="/assets/images/service_wood_structure.png"
+                                alt="木造解体工事"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
                         </div>
                     </div>
 
@@ -55,8 +59,12 @@ export default function Service() {
                                 <li>アパートの解体</li>
                             </ul>
                         </div>
-                        <div style={{ flex: 1, minWidth: '300px', backgroundColor: '#ddd', minHeight: '300px' }}>
-                            <div style={{ width: '100%', height: '100%', background: '#cccccc', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>鉄骨造解体イメージ</div>
+                        <div style={{ flex: 1, minWidth: '300px', height: '400px', overflow: 'hidden' }}>
+                            <img
+                                src="/assets/images/service_steel_structure.png"
+                                alt="鉄骨造解体工事"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
                         </div>
                     </div>
 
@@ -74,8 +82,12 @@ export default function Service() {
                                 <li>大規模改修に伴う解体</li>
                             </ul>
                         </div>
-                        <div style={{ flex: 1, minWidth: '300px', backgroundColor: '#ddd', minHeight: '300px' }}>
-                            <div style={{ width: '100%', height: '100%', background: '#bbbbbb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#777' }}>RC造解体イメージ</div>
+                        <div style={{ flex: 1, minWidth: '300px', height: '400px', overflow: 'hidden' }}>
+                            <img
+                                src="/assets/images/service_rc_structure.png"
+                                alt="RC造解体工事"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
                         </div>
                     </div>
                 </div>

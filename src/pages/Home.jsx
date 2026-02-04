@@ -77,8 +77,8 @@ export default function Home() {
                             私たちは、信頼と実績で<br />
                             地域の未来を支えます。
                         </p>
-                        <Link to="/contact" className="inline-flex items-center gap-3 px-8 py-4 bg-accent text-white rounded-sm hover:bg-accent-hover transition-colors font-bold tracking-wider">
-                            お問い合わせ・お見積り <ArrowRight size={20} />
+                        <Link to="/estimate" className="inline-flex items-center gap-3 px-8 py-4 bg-accent text-white rounded-sm hover:bg-accent-hover transition-colors font-bold tracking-wider">
+                            簡単お見積もり <ArrowRight size={20} />
                         </Link>
                     </div>
                 </div>
@@ -283,8 +283,8 @@ export default function Home() {
                             <p className="text-xs text-gray-400 mt-2">受付時間 8:00 - 18:00 (日曜定休)</p>
                         </div>
                         <div className="bg-primary p-8 rounded shadow-sm flex-1 max-w-md mx-auto w-full flex flex-col justify-center items-center">
-                            <Link to="/contact" className="text-white text-xl font-bold flex items-center gap-2 hover:text-accent transition-colors">
-                                お問い合わせフォーム <ArrowRight />
+                            <Link to="/estimate" className="text-white text-xl font-bold flex items-center gap-2 hover:text-accent transition-colors">
+                                簡単お見積もりフォーム <ArrowRight />
                             </Link>
                         </div>
                     </div>

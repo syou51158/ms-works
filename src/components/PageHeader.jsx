@@ -15,24 +15,41 @@ const PageHeader = ({ title, subtitle, image, height = '40vh' }) => {
             className="relative flex items-center justify-center overflow-hidden parallax"
             style={{
                 height: height,
-                minHeight: '350px',
+                minHeight: '400px',
                 backgroundImage: `url('${image}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
                 backgroundColor: '#0A246A' // Fallback color
             }}
         >
-            {/* Dark Overlay for text readability */}
-            <div className="absolute inset-0 bg-black/40 bg-gradient-to-b from-primary/30 to-black/50" />
+            {/* Premium Dark Overlay with Sophisticated Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0A246A]/50 via-[#0A246A]/30 to-black/80" />
 
-            <div className={`relative z-10 text-center text-white fade-in-up ${isVisible ? 'visible' : ''}`}>
-                <p className="text-accent font-bold tracking-[0.2em] mb-2 uppercase text-sm md:text-base">
+            <div className={`relative z-10 text-center text-white px-6 py-12 fade-in-up ${isVisible ? 'visible' : ''}`}>
+                <p
+                    className="text-accent font-bold tracking-[0.4em] mb-4 uppercase text-xs md:text-sm"
+                    style={{
+                        textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+                        fontFamily: 'var(--font-sans)'
+                    }}
+                >
                     {subtitle}
                 </p>
-                <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-wider">
+                <h1
+                    className="text-5xl md:text-7xl font-serif font-bold tracking-wider leading-tight mb-8"
+                    style={{
+                        textShadow: '0 4px 16px rgba(0,0,0,0.7)',
+                        letterSpacing: '0.15em'
+                    }}
+                >
                     {title}
                 </h1>
 
-                {/* Decorative line */}
-                <div className="w-12 h-1 bg-accent mx-auto mt-6"></div>
+                {/* Decorative line with glow effect */}
+                <div
+                    className="w-20 h-[3px] bg-accent mx-auto"
+                    style={{ boxShadow: '0 0 10px rgba(197, 160, 89, 0.6)' }}
+                ></div>
             </div>
         </div>
     );

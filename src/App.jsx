@@ -14,6 +14,7 @@ import Dashboard from './pages/admin/Dashboard';
 import Signup from './pages/admin/Signup';
 import AdminNews from './pages/admin/News';
 import AdminWorks from './pages/admin/Works';
+import Estimate from './pages/Estimate';
 
 function App() {
     return (
@@ -28,6 +29,7 @@ function App() {
                 <Route path="news/:id" element={<NewsDetail />} />
                 <Route path="recruit" element={<Recruit />} />
                 <Route path="contact" element={<Contact />} />
+                <Route path="estimate" element={<Estimate />} />
             </Route>
 
             {/* Admin Auth Routes (Public) */}

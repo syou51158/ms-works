@@ -14,6 +14,37 @@ export default function Contact() {
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
 
                         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+                            <div style={{
+                                background: 'linear-gradient(135deg, #2c5f7a 0%, #3a7a99 100%)',
+                                padding: '30px',
+                                borderRadius: '12px',
+                                marginBottom: '30px',
+                                boxShadow: '0 4px 20px rgba(44, 95, 122, 0.2)'
+                            }}>
+                                <p style={{ color: 'white', fontSize: '1.1rem', marginBottom: '20px', fontWeight: '600' }}>
+                                    🎯 お見積もりをご希望の方は、専用フォームが便利です
+                                </p>
+                                <a
+                                    href="/estimate"
+                                    style={{
+                                        display: 'inline-block',
+                                        padding: '15px 40px',
+                                        background: 'var(--color-accent)',
+                                        color: 'white',
+                                        borderRadius: '50px',
+                                        fontWeight: 'bold',
+                                        textDecoration: 'none',
+                                        fontSize: '1.1rem',
+                                        boxShadow: '0 4px 15px rgba(212, 165, 116, 0.4)',
+                                        transition: 'transform 0.3s ease'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    簡単お見積もりフォームはこちら →
+                                </a>
+                            </div>
+
                             <p style={{ marginBottom: '20px' }}>
                                 解体工事に関するご質問、お見積りのご依頼、採用へのご応募など、<br />
                                 下記メールフォームまたはお電話にてお気軽にお問い合わせください。
