@@ -19,7 +19,7 @@ jobs:
           key: ${{ secrets.SFTP_SSH_KEY }}
           port: 2222
           script: |
-            echo "=== CURRENT DIRECTORY ==="
+            echo "=== ATTEMPT 2: CHECKING CONNECTION ==="
             pwd
             echo "=== LIST FILES (Level 1) ==="
             ls -la
