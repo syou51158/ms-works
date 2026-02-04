@@ -1,12 +1,13 @@
+import PageHeader from '../components/PageHeader';
+
 export default function Contact() {
     return (
         <>
-            <div style={{ height: '300px', backgroundColor: 'var(--color-base)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="text-center fade-in-up visible">
-                    <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', color: 'var(--color-primary)' }}>お問い合わせ</h1>
-                    <p style={{ marginTop: '10px', opacity: 0.8, letterSpacing: '0.1em', color: 'var(--color-primary)' }}>CONTACT</p>
-                </div>
-            </div>
+            <PageHeader
+                title="お問い合わせ"
+                subtitle="CONTACT"
+                image="/assets/images/header_contact.png"
+            />
 
             <section className="section">
                 <div className="container fade-in-up visible">

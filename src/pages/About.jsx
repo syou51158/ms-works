@@ -1,12 +1,13 @@
+import PageHeader from '../components/PageHeader';
+
 export default function About() {
     return (
         <>
-            <div style={{ height: '300px', backgroundColor: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                <div className="text-center fade-in-up visible">
-                    <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem' }}>会社情報</h1>
-                    <p style={{ marginTop: '10px', opacity: 0.8, letterSpacing: '0.1em' }}>COMPANY INFO</p>
-                </div>
-            </div>
+            <PageHeader
+                title="会社情報"
+                subtitle="WHO WE ARE"
+                image="/assets/images/header_about.png"
+            />
 
             <section className="section">
                 <div className="container">

@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
+import PageHeader from '../components/PageHeader';
+
 export default function News() {
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -23,12 +25,11 @@ export default function News() {
 
     return (
         <>
-            <div style={{ height: '300px', backgroundColor: 'var(--color-base)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="text-center fade-in-up visible">
-                    <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', color: 'var(--color-primary)' }}>お知らせ</h1>
-                    <p style={{ marginTop: '10px', opacity: 0.8, letterSpacing: '0.1em', color: 'var(--color-primary)' }}>NEWS</p>
-                </div>
-            </div>
+            <PageHeader
+                title="お知らせ"
+                subtitle="NEWS & TOPICS"
+                image="/assets/images/header_news.png"
+            />
 
             <section className="section">
                 <div className="container fade-in-up visible">

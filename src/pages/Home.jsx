@@ -1,85 +1,166 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 
 export default function Home() {
+    const [news, setNews] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchNews();
+    }, []);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        // Small timeout to ensure DOM is ready
+        const timer = setTimeout(() => {
+            const elements = document.querySelectorAll('.fade-in-up');
+            elements.forEach(el => observer.observe(el));
+        }, 100);
+
+        return () => {
+            observer.disconnect();
+            clearTimeout(timer);
+        };
+    }, [loading]); // Re-run when loading changes as content might shift
+
+    const fetchNews = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('news')
+                .select('*')
+                .eq('is_published', true)
+                .order('published_at', { ascending: false })
+                .limit(3);
+
+            if (error) throw error;
+            setNews(data || []);
+        } catch (error) {
+            console.error('Error fetching news:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <>
+        <div className="font-sans">
             {/* Hero Section */}
-            <section className="hero" style={{
-                height: '100vh',
-                backgroundImage: "linear-gradient(rgba(10, 36, 106, 0.4), rgba(10, 36, 106, 0.4)), url('/assets/images/hero.png')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                textAlign: 'center'
+            <section className="relative h-screen flex items-center justify-center overflow-hidden parallax" style={{
+                backgroundImage: "url('/assets/images/hero_modern_construction.png')",
             }}>
-                <div className="container fade-in-up visible">
-                    <h2 style={{ fontSize: '1.2rem', marginBottom: '2rem', letterSpacing: '0.2em', fontWeight: 500 }}>KYOTO / KUSE-GUN</h2>
-                    <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '4rem', marginBottom: '2rem', lineHeight: 1.4 }}>
-                        まちに、人に、<br />
-                        やさしい解体。
-                    </h1>
-                    <p style={{ fontSize: '1.1rem', marginBottom: '3rem', opacity: 0.9 }}>
-                        丁寧な施工と近隣への配慮で、未来をつくるための<br />
-                        「第一歩」をお手伝いします。
-                    </p>
-                    <Link to="/contact" className="btn btn-accent">お問い合わせ・お見積り</Link>
-                </div>
-            </section>
+                <div className="absolute inset-0 bg-black/40" /> {/* Overlay using Tailwind opacity */}
 
-            {/* News Section (Dynamic Placeholder) */}
-            <section className="section" style={{ backgroundColor: 'white' }}>
-                <div className="container">
-                    <div className="text-center fade-in-up visible">
-                        <span className="section-subtitle">NEWS</span>
-                        <h2 className="section-title">新着情報</h2>
-                    </div>
-
-                    <div className="fade-in-up visible" style={{ maxWidth: '800px', margin: '40px auto 0' }}>
-                        <ul className="news-list" style={{ borderTop: '1px solid #eee' }}>
-                            {/* Static Data for now - will be replaced by Supabase Data */}
-                            <li style={{ borderBottom: '1px solid #eee', padding: '20px 0', display: 'flex', alignItems: 'baseline' }}>
-                                <time style={{ width: '120px', color: '#888', fontFamily: 'var(--font-serif)' }}>2022.05.13</time>
-                                <Link to="/news/421" style={{ fontWeight: 500 }}>「誰も住まなくなった家を解体したい」そんなあなたへ</Link>
-                            </li>
-                            <li style={{ borderBottom: '1px solid #eee', padding: '20px 0', display: 'flex', alignItems: 'baseline' }}>
-                                <time style={{ width: '120px', color: '#888', fontFamily: 'var(--font-serif)' }}>2022.02.24</time>
-                                <Link to="/news/416" style={{ fontWeight: 500 }}>解体工事のご依頼は『株式会社M'Sworks』へ！</Link>
-                            </li>
-                            <li style={{ borderBottom: '1px solid #eee', padding: '20px 0', display: 'flex', alignItems: 'baseline' }}>
-                                <time style={{ width: '120px', color: '#888', fontFamily: 'var(--font-serif)' }}>2021.09.17</time>
-                                <Link to="/news/409" style={{ fontWeight: 500 }}>株式会社M'Sworksってどんな会社？</Link>
-                            </li>
-                        </ul>
-                        <div className="text-center" style={{ marginTop: '40px' }}>
-                            <Link to="/news" style={{ color: 'var(--color-primary)', fontWeight: 600, borderBottom: '1px solid var(--color-primary)' }}>
-                                ニュース一覧を見る →
-                            </Link>
+                <div className="container relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 h-full items-center">
+                    <div className="text-white hidden md:block">
+                        {/* Vertical Text Area */}
+                        <div className="text-vertical h-[60vh] flex flex-col justify-center items-end border-r border-white/30 pr-8">
+                            <h2 className="text-xl tracking-[0.5em] mb-4">KYOTO / KUSE-GUN</h2>
+                            <p className="text-lg opacity-80 mt-4">未来をつくる、第一歩。</p>
                         </div>
                     </div>
+
+                    <div className="text-center md:text-left text-white p-6 md:p-0">
+                        <h1 className="text-5xl md:text-7xl font-bold font-serif leading-tight mb-8">
+                            まちに、人に、<br />
+                            やさしい解体。
+                        </h1>
+                        <p className="text-lg md:text-xl mb-12 opacity-90 leading-relaxed max-w-md">
+                            丁寧な施工と近隣への配慮。<br />
+                            私たちは、信頼と実績で<br />
+                            地域の未来を支えます。
+                        </p>
+                        <Link to="/contact" className="inline-flex items-center gap-3 px-8 py-4 bg-accent text-white rounded-sm hover:bg-accent-hover transition-colors font-bold tracking-wider">
+                            お問い合わせ・お見積り <ArrowRight size={20} />
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white animate-bounce opacity-70">
+                    <ChevronDown size={32} />
                 </div>
             </section>
 
-            {/* Concept / About */}
-            <section className="section" style={{ backgroundColor: 'var(--color-base)' }}>
-                <div className="container">
-                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '60px' }}>
-                        <div className="fade-in-up visible" style={{ flex: 1, minWidth: '300px' }}>
-                            <span className="section-subtitle">WHO WE ARE</span>
-                            <h2 className="section-title" style={{ textAlign: 'left', marginLeft: 0 }}>解体から始まる、<br />新しい未来。</h2>
-                            <p style={{ marginBottom: '2rem', lineHeight: 2 }}>
+            {/* News Section */}
+            <section className="py-24 bg-white">
+                <div className="container max-w-5xl mx-auto px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-100 pb-4">
+                        <div>
+                            <span className="text-accent font-bold tracking-widest text-sm block mb-2">NEWS & TOPICS</span>
+                            <h2 className="text-3xl font-serif font-bold text-gray-800">新着情報</h2>
+                        </div>
+                        <Link to="/news" className="hidden md:flex items-center text-primary font-medium hover:text-accent transition-colors gap-2 group">
+                            一覧を見る <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </div>
+
+                    <div className="space-y-4">
+                        {loading ? (
+                            <div className="text-center py-10 text-gray-400">読み込み中...</div>
+                        ) : news.length === 0 ? (
+                            <div className="text-center py-10 text-gray-400">お知らせはありません。</div>
+                        ) : (
+                            news.map((item) => (
+                                <Link to={`/news/${item.id}`} key={item.id} className="group block bg-white hover:bg-gray-50 transition-colors p-6 border-b border-gray-100">
+                                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                                        <time className="text-gray-400 font-serif w-32 shrink-0">
+                                            {new Date(item.published_at).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.')}
+                                        </time>
+                                        <h3 className="text-lg font-medium text-gray-800 group-hover:text-primary transition-colors flex-grow">
+                                            {item.title}
+                                        </h3>
+                                        <span className="text-accent opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-[-10px] group-hover:translate-x-0">
+                                            <ArrowRight size={20} />
+                                        </span>
+                                    </div>
+                                </Link>
+                            ))
+                        )}
+                    </div>
+
+                    <div className="mt-8 text-center md:hidden">
+                        <Link to="/news" className="text-primary font-medium">ニュース一覧を見る →</Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* Concept / About Section */}
+            <section className="py-32 bg-base relative overflow-hidden">
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                        <div className="order-2 md:order-1 fade-in-up">
+                            <span className="text-accent font-bold tracking-widest text-sm block mb-4">WHO WE ARE</span>
+                            <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 leading-tight mb-8">
+                                解体から始まる、<br />
+                                新しい未来。
+                            </h2>
+                            <p className="text-gray-600 leading-loose mb-8 text-lg text-justify">
                                 株式会社M'Sworksは、京都府久世郡を拠点に近畿一円で解体工事を行っています。<br />
                                 解体工事は、単に建物を壊すだけではありません。それは、新しい街づくり、新しい暮らしへの「第一歩」です。<br /><br />
                                 騒音や粉塵、振動などの対策を徹底し、近隣の皆様に配慮した「やさしい解体」を心がけています。
                             </p>
-                            <Link to="/about" className="btn btn-primary">会社情報を見る</Link>
+                            <Link to="/about" className="inline-block px-10 py-3 border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white transition-colors duration-300">
+                                私たちについて
+                            </Link>
                         </div>
-                        <div className="fade-in-up visible" style={{ flex: 1, minWidth: '300px' }}>
-                            <div style={{ width: '100%', height: '400px', backgroundColor: '#ddd', backgroundImage: "url('/assets/images/hero.png')", backgroundSize: 'cover', borderRadius: '4px', position: 'relative' }}>
-                                <div style={{ position: 'absolute', top: '20px', left: '-20px', background: 'white', padding: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
-                                    <p style={{ fontFamily: 'var(--font-serif)', fontSize: '1.2rem', margin: 0 }}>
+                        <div className="order-1 md:order-2 relative fade-in-up">
+                            <div className="relative">
+                                <div className="absolute -top-4 -left-4 w-24 h-24 border-t-2 border-l-2 border-accent/30 hidden md:block"></div>
+                                <div className="absolute -bottom-4 -right-4 w-24 h-24 border-b-2 border-r-2 border-accent/30 hidden md:block"></div>
+                                <img
+                                    src="/assets/images/about_trust_professional.png"
+                                    alt="Professional Handshake"
+                                    className="w-full h-[500px] object-cover shadow-2xl rounded-sm"
+                                />
+                                <div className="absolute -bottom-10 -left-10 bg-white p-8 shadow-xl hidden md:block max-w-xs">
+                                    <p className="font-serif text-xl leading-relaxed text-gray-800">
                                         信頼と実績の<br />プロフェッショナル集団
                                     </p>
                                 </div>
@@ -87,63 +168,128 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
+                {/* Decorative background element */}
+                <div className="absolute top-0 right-0 w-1/3 h-full bg-gray-50/50 -z-0"></div>
             </section>
 
-            {/* Services */}
-            <section className="section" style={{ backgroundColor: 'white' }}>
-                <div className="container">
-                    <div className="text-center fade-in-up visible">
-                        <span className="section-subtitle">OUR SERVICES</span>
-                        <h2 className="section-title">事業案内</h2>
-                        <p style={{ maxWidth: '600px', margin: '0 auto 40px' }}>木造・鉄骨造・RC造など、あらゆる建物の解体工事に対応いたします。</p>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', marginTop: '40px' }}>
-                        {/* Service 1 */}
-                        <div className="fade-in-up visible" style={{ background: '#f9f9f9', padding: '40px', borderRadius: '2px', textAlign: 'center' }}>
-                            <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '1rem', fontSize: '1.4rem' }}>木造解体工事</h3>
-                            <p style={{ fontSize: '0.9rem', color: '#666' }}>一般的な住宅の解体工事です。近隣への挨拶回りから整地まで、一貫して丁寧に行います。</p>
-                        </div>
-                        {/* Service 2 */}
-                        <div className="fade-in-up visible" style={{ background: '#f9f9f9', padding: '40px', borderRadius: '2px', textAlign: 'center' }}>
-                            <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '1rem', fontSize: '1.4rem' }}>鉄骨造解体工事</h3>
-                            <p style={{ fontSize: '0.9rem', color: '#666' }}>店舗やアパートに多い鉄骨造。安全管理を徹底し、スピーディーに解体します。</p>
-                        </div>
-                        {/* Service 3 */}
-                        <div className="fade-in-up visible" style={{ background: '#f9f9f9', padding: '40px', borderRadius: '2px', textAlign: 'center' }}>
-                            <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '1rem', fontSize: '1.4rem' }}>RC造解体工事</h3>
-                            <p style={{ fontSize: '0.9rem', color: '#666' }}>頑丈なコンクリート造の建物も、適切な重機と技術で安全に解体いたします。</p>
-                        </div>
-                    </div>
-
-                    <div className="text-center fade-in-up visible" style={{ marginTop: '50px' }}>
-                        <Link to="/service" className="btn btn-primary">事業案内を詳しく見る</Link>
-                    </div>
-                </div>
-            </section>
-
-            {/* Recruit & Contact CTA */}
-            <section className="section" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
-                <div className="container fade-in-up visible" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '40px' }}>
-                    <div style={{ flex: 1, minWidth: '300px' }}>
-                        <span style={{ color: 'var(--color-accent)', fontWeight: 700, letterSpacing: '0.1em' }}>RECRUIT</span>
-                        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', margin: '10px 0 20px' }}>一緒に働く仲間を募集中</h2>
-                        <p style={{ opacity: 0.9, marginBottom: '30px' }}>
-                            経験不問。資格取得支援あり。<br />
-                            私たちと一緒に、地域の未来をつくりませんか？
+            {/* Services Section */}
+            <section className="py-32 bg-white">
+                <div className="container mx-auto px-6">
+                    <div className="text-center mb-20 fade-in-up">
+                        <span className="text-accent font-bold tracking-widest text-sm block mb-4">OUR SERVICES</span>
+                        <h2 className="text-4xl font-serif font-bold text-gray-800 mb-6">事業案内</h2>
+                        <p className="text-gray-500 max-w-2xl mx-auto">
+                            木造・鉄骨造・RC造など、あらゆる建物の解体工事に対応いたします。<br />
+                            お客様のニーズに合わせた最適なプランをご提案します。
                         </p>
-                        <Link to="/recruit" className="btn btn-accent">採用情報を見る</Link>
                     </div>
-                    <div style={{ flex: 1, minWidth: '300px', background: 'rgba(255,255,255,0.1)', padding: '40px', borderRadius: '4px' }}>
-                        <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', marginBottom: '1.5rem' }}>お見積り・ご相談</h3>
-                        <p style={{ marginBottom: '20px' }}>解体工事に関するご質問など、お気軽にお問い合わせください。</p>
-                        <div style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '1.2rem' }}>TEL.</span> 080-4012-3141
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Service 1 */}
+                        <div className="group card-hover bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 fade-in-up">
+                            <div className="h-64 overflow-hidden relative">
+                                <img src="/assets/images/service_wood_structure.png" alt="Wood Structure" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                            </div>
+                            <div className="p-8 text-center relative">
+                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white w-16 h-16 flex items-center justify-center rounded-full shadow-lg text-primary font-bold text-xl font-serif border border-gray-100">
+                                    01
+                                </div>
+                                <h3 className="text-2xl font-serif font-bold text-gray-800 mb-4 mt-6">木造解体工事</h3>
+                                <p className="text-gray-600 text-sm leading-relaxed mb-6">
+                                    一般的な住宅の解体工事です。近隣への挨拶回りから整地まで、一貫して丁寧に行います。
+                                </p>
+                                <span className="text-accent text-sm font-bold tracking-wider group-hover:underline">MORE DETAIL</span>
+                            </div>
                         </div>
-                        <Link to="/contact" className="btn btn-white" style={{ background: 'white', color: 'var(--color-primary)', width: '100%', textAlign: 'center', display: 'block', padding: '16px 0', fontWeight: 600, borderRadius: '2px' }}>お問い合わせフォーム</Link>
+
+                        {/* Service 2 */}
+                        <div className="group card-hover bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 fade-in-up" style={{ transitionDelay: '100ms' }}>
+                            <div className="h-64 overflow-hidden relative">
+                                <img src="/assets/images/service_steel_structure.png" alt="Steel Structure" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                            </div>
+                            <div className="p-8 text-center relative">
+                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white w-16 h-16 flex items-center justify-center rounded-full shadow-lg text-primary font-bold text-xl font-serif border border-gray-100">
+                                    02
+                                </div>
+                                <h3 className="text-2xl font-serif font-bold text-gray-800 mb-4 mt-6">鉄骨造解体工事</h3>
+                                <p className="text-gray-600 text-sm leading-relaxed mb-6">
+                                    店舗やアパートに多い鉄骨造。安全管理を徹底し、スピーディーに解体します。
+                                </p>
+                                <span className="text-accent text-sm font-bold tracking-wider group-hover:underline">MORE DETAIL</span>
+                            </div>
+                        </div>
+
+                        {/* Service 3 */}
+                        <div className="group card-hover bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 fade-in-up" style={{ transitionDelay: '200ms' }}>
+                            <div className="h-64 overflow-hidden relative">
+                                <img src="/assets/images/service_rc_structure.png" alt="RC Structure" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                            </div>
+                            <div className="p-8 text-center relative">
+                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white w-16 h-16 flex items-center justify-center rounded-full shadow-lg text-primary font-bold text-xl font-serif border border-gray-100">
+                                    03
+                                </div>
+                                <h3 className="text-2xl font-serif font-bold text-gray-800 mb-4 mt-6">RC造解体工事</h3>
+                                <p className="text-gray-600 text-sm leading-relaxed mb-6">
+                                    頑丈なコンクリート造の建物も、適切な重機と技術で安全に解体いたします。
+                                </p>
+                                <span className="text-accent text-sm font-bold tracking-wider group-hover:underline">MORE DETAIL</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="text-center mt-16">
+                        <Link to="/service" className="inline-block px-10 py-3 bg-primary text-white rounded-sm hover:bg-primary-dark transition-colors shadow-lg">
+                            事業案内を詳しく見る
+                        </Link>
                     </div>
                 </div>
             </section>
-        </>
+
+            {/* Recruit Section */}
+            <section className="relative py-40 parallax" style={{
+                backgroundImage: "url('/assets/images/recruit_future_team_v2.png')",
+            }}>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/40"></div>
+                <div className="container mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center justify-between">
+                    <div className="text-white mb-10 md:mb-0 max-w-2xl">
+                        <span className="text-accent font-bold tracking-widest text-sm block mb-4">RECRUIT</span>
+                        <h2 className="text-5xl font-serif font-bold leading-tight mb-8">
+                            一緒に働く仲間を<br />募集中
+                        </h2>
+                        <p className="text-xl opacity-90 leading-relaxed mb-10">
+                            経験不問。資格取得支援あり。<br />
+                            私たちと一緒に、地域の未来をつくりませんか？<br />
+                            あなたのやる気を全力でサポートします。
+                        </p>
+                        <Link to="/recruit" className="inline-flex items-center gap-3 px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-primary transition-all duration-300 font-bold tracking-wider rounded-sm">
+                            採用情報を見る <ArrowRight size={20} />
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* Contact CTA */}
+            <section className="py-24 bg-gray-50">
+                <div className="container mx-auto px-6 text-center">
+                    <h2 className="text-3xl font-serif font-bold text-gray-800 mb-8">お見積り・ご相談はお気軽に</h2>
+                    <p className="text-gray-600 mb-10">解体工事に関するご質問など、まずは電話またはフォームよりお問い合わせください。</p>
+                    <div className="flex flex-col md:flex-row justify-center gap-6">
+                        <div className="bg-white p-8 rounded shadow-sm border border-gray-100 flex-1 max-w-md mx-auto w-full">
+                            <p className="text-sm text-gray-500 mb-2">お電話でのお問い合わせ</p>
+                            <a href="tel:080-4012-3141" className="text-3xl font-bold text-primary font-serif block hover:text-accent transition-colors">080-4012-3141</a>
+                            <p className="text-xs text-gray-400 mt-2">受付時間 8:00 - 18:00 (日曜定休)</p>
+                        </div>
+                        <div className="bg-primary p-8 rounded shadow-sm flex-1 max-w-md mx-auto w-full flex flex-col justify-center items-center">
+                            <Link to="/contact" className="text-white text-xl font-bold flex items-center gap-2 hover:text-accent transition-colors">
+                                お問い合わせフォーム <ArrowRight />
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
     );
 }

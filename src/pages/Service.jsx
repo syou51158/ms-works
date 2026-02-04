@@ -1,13 +1,13 @@
+import PageHeader from '../components/PageHeader';
+
 export default function Service() {
     return (
         <>
-            <div style={{ height: '300px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                <div style={{ position: 'absolute', inset: 0, backgroundImage: "linear-gradient(rgba(10,36,106,0.6), rgba(10,36,106,0.6)), url('/assets/images/service_hero.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
-                <div className="text-center fade-in-up visible" style={{ position: 'relative', zIndex: 1 }}>
-                    <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem' }}>事業案内</h1>
-                    <p style={{ marginTop: '10px', opacity: 0.9, letterSpacing: '0.1em' }}>OUR SERVICES</p>
-                </div>
-            </div>
+            <PageHeader
+                title="事業案内"
+                subtitle="OUR SERVICES"
+                image="/assets/images/header_service.png"
+            />
 
             <section className="section">
                 <div className="container text-center fade-in-up visible">

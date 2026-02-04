@@ -6,6 +6,7 @@ import About from './pages/About';
 import Service from './pages/Service';
 import Works from './pages/Works';
 import News from './pages/News';
+import NewsDetail from './pages/NewsDetail';
 import Recruit from './pages/Recruit';
 import Contact from './pages/Contact';
 import Login from './pages/admin/Login';
@@ -24,6 +25,7 @@ function App() {
                 <Route path="service" element={<Service />} />
                 <Route path="works" element={<Works />} />
                 <Route path="news" element={<News />} />
+                <Route path="news/:id" element={<NewsDetail />} />
                 <Route path="recruit" element={<Recruit />} />
                 <Route path="contact" element={<Contact />} />
             </Route>

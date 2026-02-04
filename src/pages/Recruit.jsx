@@ -1,15 +1,14 @@
 import { Link } from 'react-router-dom';
+import PageHeader from '../components/PageHeader';
 
 export default function Recruit() {
     return (
         <>
-            <div style={{ height: '400px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                <div style={{ position: 'absolute', inset: 0, backgroundImage: "linear-gradient(rgba(10,36,106,0.6), rgba(10,36,106,0.6)), url('/assets/images/recruit_hero.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
-                <div className="text-center fade-in-up visible" style={{ position: 'relative', zIndex: 1 }}>
-                    <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem' }}>採用情報</h1>
-                    <p style={{ marginTop: '10px', opacity: 0.9, letterSpacing: '0.1em' }}>RECRUITMENT</p>
-                </div>
-            </div>
+            <PageHeader
+                title="採用情報"
+                subtitle="RECRUITMENT"
+                image="/assets/images/header_recruit.png"
+            />
 
             <section className="section">
                 <div className="container fade-in-up visible">
