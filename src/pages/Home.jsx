@@ -295,16 +295,23 @@ export default function Home() {
             <section className="py-24 bg-gray-50">
                 <div className="container mx-auto px-6 text-center">
                     <h2 className="text-3xl font-serif font-bold text-gray-800 mb-8">お見積り・ご相談はお気軽に</h2>
-                    <p className="text-gray-600 mb-10">解体工事に関するご質問など、まずは電話またはフォームよりお問い合わせください。</p>
+                    <p className="text-gray-600 mb-10">解体工事に関するご相談は、電話・LINE・フォームより承っております。</p>
                     <div className="flex flex-col md:flex-row justify-center gap-6">
-                        <div className="bg-white p-8 rounded shadow-sm border border-gray-100 flex-1 max-w-md mx-auto w-full">
-                            <p className="text-sm text-gray-500 mb-2">お電話でのお問い合わせ</p>
+                        <div className="bg-white p-8 rounded shadow-sm border border-gray-100 flex-1 max-w-sm mx-auto w-full">
+                            <p className="text-sm text-gray-500 mb-2">お電話で</p>
                             <a href="tel:080-4012-3141" className="text-3xl font-bold text-primary font-serif block hover:text-accent transition-colors">080-4012-3141</a>
                             <p className="text-xs text-gray-400 mt-2">受付時間 8:00 - 18:00 (日曜定休)</p>
                         </div>
-                        <div className="bg-primary p-8 rounded shadow-sm flex-1 max-w-md mx-auto w-full flex flex-col justify-center items-center">
-                            <Link to="/estimate" className="text-white text-xl font-bold flex items-center gap-2 hover:text-accent transition-colors">
-                                簡単お見積もりフォーム <ArrowRight />
+                        <div className="bg-[#06C755] hover:bg-[#05b34c] p-8 rounded shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex-1 max-w-sm mx-auto w-full flex flex-col justify-center items-center group">
+                            <a href="https://lin.ee/958ABOg" target="_blank" rel="noopener noreferrer" className="text-white flex flex-col items-center gap-4 w-full h-full justify-center">
+                                <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 opacity-90 group-hover:scale-110 transition-transform"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 3.978 8.885 9.444 9.617 1.25.168 1.488.513 1.341 1.482-.149.972-.511 2.373-.511 2.373 0 0-.083.473.684.093s4.116-2.424 7.218-5.267c2.62-2.399 3.824-4.8 3.824-8.298z"/></svg>
+                                <span className="text-xl font-bold tracking-wider">LINEで相談する</span>
+                            </a>
+                        </div>
+                        <div className="bg-primary hover:bg-primary-dark p-8 rounded shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex-1 max-w-sm mx-auto w-full flex flex-col justify-center items-center">
+                            <Link to="/estimate" className="text-white font-bold flex flex-col items-center gap-3 w-full h-full justify-center group">
+                                <span className="text-xl tracking-wider group-hover:text-accent transition-colors">WEBお見積もり</span>
+                                <span className="text-sm opacity-70">24時間受付中</span>
                             </Link>
                         </div>
                     </div>
