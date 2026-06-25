@@ -9,6 +9,7 @@ import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
 import Recruit from './pages/Recruit';
 import Contact from './pages/Contact';
+import EmailSetup from './pages/EmailSetup';
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
 import Signup from './pages/admin/Signup';
@@ -33,6 +34,7 @@ function App() {
                 <Route path="recruit" element={<Recruit />} />
                 <Route path="contact" element={<Contact />} />
                 <Route path="estimate" element={<Estimate />} />
+                <Route path="email-setup" element={<EmailSetup />} />
             </Route>
 
             {/* Admin Auth Routes (Public) */}
