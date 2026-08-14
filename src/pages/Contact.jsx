@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import PageHeader from '../components/PageHeader';
 import { supabase } from '../lib/supabase';
+import { getAttributionData, isMissingColumnError } from '../lib/attribution';
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function Contact() {
@@ -29,17 +30,28 @@ export default function Contact() {
             // Determine if this is a recruitment application
             const isRecruitment = formData.subject === 'recruit';
 
-            const { error: dbError } = await supabase
+            const baseData = {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                subject: formData.subject,
+                message: formData.message,
+                is_recruitment: isRecruitment,
+                status: 'unread'
+            };
+
+            // 流入元トラッキング付きで送信
+            let { error: dbError } = await supabase
                 .from('inquiries')
-                .insert([{
-                    name: formData.name,
-                    email: formData.email,
-                    phone: formData.phone,
-                    subject: formData.subject,
-                    message: formData.message,
-                    is_recruitment: isRecruitment,
-                    status: 'unread'
-                }]);
+                .insert([{ ...baseData, ...getAttributionData() }]);
+
+            // DB側に流入元カラムが未追加の場合は従来形式で再送信
+            if (dbError && isMissingColumnError(dbError)) {
+                console.warn('Attribution columns missing, retrying without them:', dbError.message);
+                ({ error: dbError } = await supabase
+                    .from('inquiries')
+                    .insert([baseData]));
+            }
 
             if (dbError) throw dbError;
 

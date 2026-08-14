@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Search, Mail, Phone, Calendar, Clock, CheckCircle } from 'lucide-react';
+import { Search, Mail, Phone, Calendar, Clock, CheckCircle, Globe, Smartphone, Monitor } from 'lucide-react';
+import { channelLabel } from '../../lib/attribution';
 
 export default function AdminInquiries() {
     const [inquiries, setInquiries] = useState([]);
@@ -140,6 +141,25 @@ export default function AdminInquiries() {
                             <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
                                 {inquiry.message}
                             </div>
+
+                            {inquiry.channel && (
+                                <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-3 text-xs text-gray-600">
+                                    <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded font-bold flex items-center gap-1">
+                                        <Globe size={12} /> 流入元: {channelLabel(inquiry.channel)}
+                                    </span>
+                                    {inquiry.device && (
+                                        <span className="flex items-center gap-1">
+                                            {inquiry.device === 'mobile' ? <Smartphone size={12} /> : <Monitor size={12} />}
+                                            {inquiry.device === 'mobile' ? 'スマホ' : 'PC'}
+                                        </span>
+                                    )}
+                                    {inquiry.landing_page && <span>最初に見たページ: {inquiry.landing_page}</span>}
+                                    {inquiry.utm_campaign && <span>キャンペーン: {inquiry.utm_campaign}</span>}
+                                    {inquiry.first_visit_at && (
+                                        <span>初回訪問: {new Date(inquiry.first_visit_at).toLocaleDateString('ja-JP')}</span>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import PageHeader from '../components/PageHeader';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { getAttributionData, isMissingColumnError } from '../lib/attribution';
 
 export default function Estimate() {
     const [formData, setFormData] = useState({
@@ -88,11 +89,20 @@ export default function Estimate() {
                 status: 'pending'
             };
 
-            // 2. Insert into Supabase DB
-            const { data, error: dbError } = await supabase
+            // 2. Insert into Supabase DB (流入元トラッキング付き)
+            let { data, error: dbError } = await supabase
                 .from('estimates')
-                .insert([dbData])
+                .insert([{ ...dbData, ...getAttributionData() }])
                 .select();
+
+            // DB側に流入元カラムが未追加の場合は従来形式で再送信
+            if (dbError && isMissingColumnError(dbError)) {
+                console.warn('Attribution columns missing, retrying without them:', dbError.message);
+                ({ data, error: dbError } = await supabase
+                    .from('estimates')
+                    .insert([dbData])
+                    .select());
+            }
 
             if (dbError) throw dbError;
 

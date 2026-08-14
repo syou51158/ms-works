@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Calendar, Clock, MapPin, Building2, Ruler } from 'lucide-react';
+import { Calendar, Clock, MapPin, Building2, Ruler, Globe, Smartphone, Monitor } from 'lucide-react';
+import { channelLabel } from '../../lib/attribution';
 
 export default function AdminEstimates() {
     const [estimates, setEstimates] = useState([]);
@@ -94,6 +95,25 @@ export default function AdminEstimates() {
                                     <div className="font-semibold text-sm">{est.prefecture} {est.city}</div>
                                 </div>
                             </div>
+
+                            {est.channel && (
+                                <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-3 text-xs text-gray-600">
+                                    <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded font-bold flex items-center gap-1">
+                                        <Globe size={12} /> 流入元: {channelLabel(est.channel)}
+                                    </span>
+                                    {est.device && (
+                                        <span className="flex items-center gap-1">
+                                            {est.device === 'mobile' ? <Smartphone size={12} /> : <Monitor size={12} />}
+                                            {est.device === 'mobile' ? 'スマホ' : 'PC'}
+                                        </span>
+                                    )}
+                                    {est.landing_page && <span>最初に見たページ: {est.landing_page}</span>}
+                                    {est.utm_campaign && <span>キャンペーン: {est.utm_campaign}</span>}
+                                    {est.first_visit_at && (
+                                        <span>初回訪問: {new Date(est.first_visit_at).toLocaleDateString('ja-JP')}</span>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

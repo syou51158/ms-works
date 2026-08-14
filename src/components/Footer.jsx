@@ -35,6 +35,9 @@ export default function Footer() {
                 </div>
                 <div className="copyright">
                     &copy; 2023 M'Sworks Co., Ltd. All Rights Reserved.
+                    <div style={{ marginTop: '8px', fontSize: '0.75rem', opacity: 0.6 }}>
+                        Website produced by <a href="https://trendcompany.co.jp" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>Trend Company</a>
+                    </div>
                 </div>
             </div>
         </footer>
