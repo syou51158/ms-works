@@ -1,58 +1,49 @@
-# M's Works Webサイト デプロイ手順書 (Lolipop対応)
+# M's Works Webサイト デプロイ手順書
 
-このドキュメントでは、完成したReactアプリケーションをロリポップ！レンタルサーバーにアップロードして公開する手順を説明します。
+## 通常のデプロイ(自動)
 
-## 1. ビルドの実行
+**`main` ブランチに push するだけで自動デプロイされます。**
 
-まず、ローカル環境で本番用のファイルを生成します。
+GitHub Actions([.github/workflows/deploy.yml](.github/workflows/deploy.yml))が以下を自動実行します:
 
-```bash
-cd /Users/muraokashou/ms-works
-npm run build
-```
+1. `npm ci` で依存関係をインストール
+2. `npm run build` で本番ビルド(Supabaseの接続情報はGitHub Secretsから注入)
+3. ビルド成果物(`dist/`)をロリポップサーバーの `web/ms-works-kyoto` へSCP転送(ポート2222)
 
-これにより、`dist` フォルダが作成され、その中に公開用のファイル一式が生成されます。
+デプロイ状況は [GitHub Actions](https://github.com/syou51158/ms-works/actions) で確認できます。push から数分で本番サイト(https://www.ms-works-kyoto.co.jp/)に反映されます。
 
-## 2. ファイルのアップロード
+### 必要なGitHub Secrets
 
-FTPソフト（FileZillaなど）またはロリポップの「ロリポップ！FTP」を使用して、ファイルをサーバーにアップロードします。
+| Secret | 内容 |
+|---|---|
+| `VITE_SUPABASE_URL` | SupabaseプロジェクトURL |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anonキー |
+| `SFTP_SERVER` | ロリポップのSFTPサーバー |
+| `SFTP_USERNAME` | SFTPユーザー名 |
+| `SFTP_PASSWORD` | SFTPパスワード |
 
-1.  **接続先**: ロリポップのFTP情報を参照してください。
-2.  **アップロードする場所**: 公開したいディレクトリ（例: `web` や `public_html` 直下、またはサブディレクトリ）。
-3.  **アップロードするファイル**:
-    `dist` フォルダの中身**すべて**をアップロードしてください。
-    
-    *   `assets` フォルダ
-    *   `index.html`
-    *   `.htaccess` (※重要: これがないとページ遷移時に404エラーになります)
-    *   `vite.svg`
+## 手動デプロイ(緊急時のフォールバック)
 
-## 3. 動作確認
+GitHub Actionsが使えない場合のみ:
 
-アップロード完了後、WebサイトのURLにアクセスして、以下の動作を確認してください。
+1. ローカルで `npm run build` を実行
+2. `dist/` フォルダの中身**すべて**(`.htaccess` 含む)をFTPソフトでロリポップの公開ディレクトリにアップロード
 
-1.  **トップページが表示されるか**: デザイン崩れがないか。
-2.  **ページ遷移ができるか**: メニューから「会社情報」や「事業案内」に移動できるか。
-3.  **管理画面**: `/admin` にアクセスし、ログイン画面が表示されるか。
-    *   ※本番環境で初めて管理画面を使う場合は、管理者アカウントが必要です。
-    *   `/admin/secret-signup` にアクセスして、最初の管理者を作成してください。
+※ `.htaccess` が無いとページ遷移時に404になります(ReactのSPAルーティング制御のため)。
 
-## トラブルシューティング
+## データベース(Supabase)
 
-*   **ページ遷移すると404エラーになる**:
-    *   `.htaccess` ファイルがアップロードされているか確認してください。これがReactのルーティングを制御しています。
-    *   Macではドットから始まるファイルが見えにくい場合があります。`Saved Files/All My Files`などで確認するか、`Command + Shift + .` で隠しファイルを表示してください。
+- スキーマ変更はSupabaseダッシュボードのSQL Editorで実行します
+  - 初期セットアップ: [database_setup.sql](database_setup.sql)、[create_estimates_table.sql](create_estimates_table.sql)
+  - 流入元トラッキング用カラム: [add_attribution_columns.sql](add_attribution_columns.sql)
+- 管理画面から更新できる内容(お知らせ・施工実績・SEO設定)はデプロイ不要で即反映されます
 
-*   **画面が真っ白になる**:
-    *   ブラウザの開発者ツール（F12）の「Console」タブを確認し、エラーが出ていないか確認してください。
-    *   パスの問題（`/` から始まる絶対パスなど）が原因の場合、`vite.config.js` の `base` 設定を調整する必要があるかもしれません（現在はデフォルト設定です）。
+## 動作確認チェックリスト
 
-## 更新方法
+デプロイ後に以下を確認:
 
-サイトの内容を更新したい場合（例：コード修正後）：
-
-1.  ローカルで修正。
-2.  `npm run build` を再度実行。
-3.  `dist` フォルダの中身をサーバーに上書きアップロード。
-
-なお、管理画面から更新できる内容（お知らせ、施工実績）については、ファイルのアップロードは不要です。管理画面から操作するだけで即座に反映されます。
+1. トップページの表示・デザイン崩れがないか
+2. ページ遷移(会社情報・事業案内・費用ガイドなど)が404にならないか
+3. 見積もりフォーム(/estimate)・お問い合わせ(/contact)が送信できるか
+4. 管理画面(/admin)にログインできるか
+5. robots.txt / sitemap.xml が配信されているか
