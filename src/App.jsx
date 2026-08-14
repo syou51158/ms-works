@@ -19,6 +19,7 @@ import AdminInquiries from './pages/admin/Inquiries';
 import AdminEstimates from './pages/admin/Estimates';
 import AdminSeo from './pages/admin/Seo';
 import Estimate from './pages/Estimate';
+import Guide from './pages/Guide';
 
 function App() {
     return (
@@ -34,6 +35,7 @@ function App() {
                 <Route path="recruit" element={<Recruit />} />
                 <Route path="contact" element={<Contact />} />
                 <Route path="estimate" element={<Estimate />} />
+                <Route path="guide" element={<Guide />} />
                 <Route path="email-setup" element={<EmailSetup />} />
             </Route>
 

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /email-setup
+
+Sitemap: https://www.ms-works-kyoto.co.jp/sitemap.xml

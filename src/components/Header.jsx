@@ -25,6 +25,7 @@ export default function Header() {
                     <NavLink to="/about" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>会社情報</NavLink>
                     <NavLink to="/service" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>事業案内</NavLink>
                     <NavLink to="/works" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>施工実績</NavLink>
+                    <NavLink to="/guide" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>費用・補助金</NavLink>
                     <NavLink to="/news" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>お知らせ</NavLink>
                     <NavLink to="/recruit" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>採用情報</NavLink>
                     <Link to="/contact" className="nav-contact-btn">お問い合わせ</Link>
@@ -42,6 +43,7 @@ export default function Header() {
                     <NavLink to="/about" className="mobile-nav-link" onClick={closeMobileMenu}>会社情報</NavLink>
                     <NavLink to="/service" className="mobile-nav-link" onClick={closeMobileMenu}>事業案内</NavLink>
                     <NavLink to="/works" className="mobile-nav-link" onClick={closeMobileMenu}>施工実績</NavLink>
+                    <NavLink to="/guide" className="mobile-nav-link" onClick={closeMobileMenu}>費用・補助金</NavLink>
                     <NavLink to="/news" className="mobile-nav-link" onClick={closeMobileMenu}>お知らせ</NavLink>
                     <NavLink to="/recruit" className="mobile-nav-link" onClick={closeMobileMenu}>採用情報</NavLink>
                     <Link to="/contact" className="btn btn-accent text-center" onClick={closeMobileMenu} style={{ marginTop: '20px' }}>お問い合わせ</Link>

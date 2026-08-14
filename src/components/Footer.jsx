@@ -21,6 +21,7 @@ export default function Footer() {
                             <li><Link to="/about">会社情報</Link></li>
                             <li><Link to="/service">事業案内</Link></li>
                             <li><Link to="/works">施工実績</Link></li>
+                            <li><Link to="/guide">解体費用・補助金ガイド</Link></li>
                             <li><Link to="/contact">お問い合わせ</Link></li>
                         </ul>
                     </div>
