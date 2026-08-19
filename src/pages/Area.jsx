@@ -1,13 +1,37 @@
+import { useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import PageHeader from '../components/PageHeader';
 import { findArea, areas } from '../data/areas';
+import { upsertJsonLd } from '../lib/seo';
 import { ArrowRight, Phone, MapPin, CheckCircle2 } from 'lucide-react';
 
 // 地域別ランディングページ (/area/:slug)
+// タイトル・description・canonical は SeoHead が pathname から解決するため、
+// ここでは構造化データだけを出す。
 export default function Area() {
     const { slug } = useParams();
     const area = findArea(slug);
+
+    // フックは早期 return より前に置く
+    useEffect(() => {
+        if (!area) return undefined;
+
+        upsertJsonLd('ld-area', {
+            '@context': 'https://schema.org',
+            '@type': 'Service',
+            serviceType: '解体工事',
+            provider: {
+                '@type': 'GeneralContractor',
+                name: "株式会社M'Sworks",
+                telephone: '+81-80-4012-3141',
+                url: 'https://www.ms-works-kyoto.co.jp/'
+            },
+            areaServed: { '@type': 'AdministrativeArea', name: area.fullName },
+            description: area.description
+        });
+
+        return () => upsertJsonLd('ld-area', null);
+    }, [area]);
 
     if (!area) {
         return <Navigate to="/service" replace />;
@@ -21,32 +45,8 @@ export default function Area() {
 
     const others = areas.filter((a) => a.slug !== slug);
 
-    const jsonLd = {
-        '@context': 'https://schema.org',
-        '@type': 'Service',
-        serviceType: '解体工事',
-        provider: {
-            '@type': 'GeneralContractor',
-            name: "株式会社M'Sworks",
-            telephone: '+81-80-4012-3141',
-            url: 'https://www.ms-works-kyoto.co.jp/'
-        },
-        areaServed: { '@type': 'AdministrativeArea', name: area.fullName },
-        description: area.description
-    };
-
     return (
         <>
-            <Helmet>
-                <title>{area.title}</title>
-                <meta name="description" content={area.description} />
-                <link rel="canonical" href={`https://www.ms-works-kyoto.co.jp/area/${area.slug}`} />
-                <meta property="og:title" content={area.title} />
-                <meta property="og:description" content={area.description} />
-                <meta property="og:url" content={`https://www.ms-works-kyoto.co.jp/area/${area.slug}`} />
-                <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
-            </Helmet>
-
             <PageHeader
                 title={`${area.name}の解体工事`}
                 subtitle={area.slug.toUpperCase()}

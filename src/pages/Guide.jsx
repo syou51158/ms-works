@@ -1,6 +1,7 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import PageHeader from '../components/PageHeader';
+import { upsertJsonLd } from '../lib/seo';
 import { CheckCircle2, AlertCircle, ArrowRight, Phone } from 'lucide-react';
 
 // 京都エリアの解体費用相場・補助金の解説ページ (SEO集客用ランディングページ)
@@ -28,15 +29,19 @@ export default function Guide() {
         }
     ];
 
-    const faqJsonLd = {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        mainEntity: faq.map(item => ({
-            '@type': 'Question',
-            name: item.q,
-            acceptedAnswer: { '@type': 'Answer', text: item.a }
-        }))
-    };
+    // 検索結果によくある質問として表示されるための構造化データ
+    useEffect(() => {
+        upsertJsonLd('ld-faq', {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faq.map((item) => ({
+                '@type': 'Question',
+                name: item.q,
+                acceptedAnswer: { '@type': 'Answer', text: item.a }
+            }))
+        });
+        return () => upsertJsonLd('ld-faq', null);
+    }, []);
 
     const priceRows = [
         { structure: '木造', price: '3〜5万円', example: '約90〜150万円' },
@@ -61,10 +66,6 @@ export default function Guide() {
 
     return (
         <>
-            <Helmet>
-                <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
-            </Helmet>
-
             <PageHeader
                 title="解体費用・補助金ガイド"
                 subtitle="GUIDE"

@@ -1,8 +1,10 @@
-import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { areas } from '../data/areas';
+import { setTitle, upsertMeta, upsertLink } from '../lib/seo';
 
+const SITE = 'https://www.ms-works-kyoto.co.jp';
 const DEFAULT_OG_IMAGE = "https://ms-works-kyoto.co.jp/assets/images/ogp_main.png";
 
 // DBにSEO設定が無いページ用のデフォルト (検索キーワードを意識したページ別メタ)
@@ -46,11 +48,18 @@ const PAGE_DEFAULTS = {
 };
 
 function defaultsFor(path) {
+    // 地域別ページ (/area/:slug) は areas.js のデータから組み立てる
+    if (path.startsWith('/area/')) {
+        const area = areas.find((a) => a.slug === path.slice('/area/'.length));
+        if (area) {
+            return { title: area.title, description: area.description, ogImage: DEFAULT_OG_IMAGE };
+        }
+    }
     const d = PAGE_DEFAULTS[path] || PAGE_DEFAULTS['/'];
     return { title: d.title, description: d.description, ogImage: DEFAULT_OG_IMAGE };
 }
 
-export default function SeoHead() {
+export default function SeoHead({ title, description, image }) {
     const location = useLocation();
     const [meta, setMeta] = useState(() => defaultsFor(location.pathname));
 
@@ -64,12 +73,17 @@ export default function SeoHead() {
         const defaults = defaultsFor(path);
         setMeta(defaults);
 
+        // 遷移が速いと古いレスポンスが後から届くので、その場合は捨てる
+        let cancelled = false;
+
         const fetchSeo = async () => {
             const { data, error } = await supabase
                 .from('seo_settings')
                 .select('*')
                 .eq('page_path', path)
                 .single();
+
+            if (cancelled) return;
 
             if (data && !error) {
                 setMeta({
@@ -81,18 +95,30 @@ export default function SeoHead() {
         };
 
         fetchSeo();
+
+        return () => { cancelled = true; };
     }, [location.pathname]);
 
-    return (
-        <Helmet>
-            <title>{meta.title}</title>
-            <meta name="description" content={meta.description} />
-            <meta property="og:title" content={meta.title} />
-            <meta property="og:description" content={meta.description} />
-            <meta property="og:image" content={meta.ogImage} />
-            <meta property="og:url" content={`https://www.ms-works-kyoto.co.jp${location.pathname}`} />
-            <link rel="canonical" href={`https://www.ms-works-kyoto.co.jp${location.pathname === '/' ? '/' : location.pathname.replace(/\/$/, '')}`} />
-            <meta name="twitter:card" content="summary_large_image" />
-        </Helmet>
-    );
+    // head へ反映する。呼び出し側から props で渡された場合はそちらを優先する。
+    useEffect(() => {
+        const t = title || meta.title;
+        const d = description || meta.description;
+        const img = image || meta.ogImage;
+        const path = location.pathname === '/' ? '/' : location.pathname.replace(/\/$/, '');
+        const url = `${SITE}${path}`;
+
+        setTitle(t);
+        upsertMeta('name', 'description', d);
+        upsertMeta('property', 'og:title', t);
+        upsertMeta('property', 'og:description', d);
+        upsertMeta('property', 'og:image', img);
+        upsertMeta('property', 'og:url', url);
+        upsertMeta('name', 'twitter:card', 'summary_large_image');
+        upsertMeta('name', 'twitter:title', t);
+        upsertMeta('name', 'twitter:description', d);
+        upsertMeta('name', 'twitter:image', img);
+        upsertLink('canonical', url);
+    }, [meta, title, description, image, location.pathname]);
+
+    return null;
 }
