@@ -20,6 +20,7 @@ import AdminEstimates from './pages/admin/Estimates';
 import AdminSeo from './pages/admin/Seo';
 import Estimate from './pages/Estimate';
 import Guide from './pages/Guide';
+import Area from './pages/Area';
 
 function App() {
     return (
@@ -36,6 +37,7 @@ function App() {
                 <Route path="contact" element={<Contact />} />
                 <Route path="estimate" element={<Estimate />} />
                 <Route path="guide" element={<Guide />} />
+                <Route path="area/:slug" element={<Area />} />
                 <Route path="email-setup" element={<EmailSetup />} />
             </Route>
 

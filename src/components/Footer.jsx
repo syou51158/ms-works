@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { areas } from '../data/areas';
 
 export default function Footer() {
     return (
@@ -23,6 +24,16 @@ export default function Footer() {
                             <li><Link to="/works">施工実績</Link></li>
                             <li><Link to="/guide">解体費用・補助金ガイド</Link></li>
                             <li><Link to="/contact">お問い合わせ</Link></li>
+                        </ul>
+                    </div>
+                    <div className="footer-links">
+                        <h4>対応エリア</h4>
+                        <ul>
+                            {areas.map((a) => (
+                                <li key={a.slug}>
+                                    <Link to={`/area/${a.slug}`}>{a.name}の解体工事</Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                     <div className="footer-links">
