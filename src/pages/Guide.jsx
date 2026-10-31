@@ -9,7 +9,7 @@ export default function Guide() {
     const faq = [
         {
             q: '京都で30坪の木造住宅を解体するといくらかかりますか？',
-            a: '木造住宅の解体費用は1坪あたり3〜5万円が目安のため、30坪で約90〜150万円が相場です。ただし前面道路の広さや隣家との距離、ブロック塀・庭木などの付帯物により変動します。正確な金額は無料の現地調査でご確認ください。'
+            a: '木造住宅の解体費用は1坪あたり4〜6万円、30坪で約120〜180万円が目安です。金額は対象建物の構造や施工条件により変動いたします。まずはお気軽にご相談ください。正確な金額は無料の現地調査でご確認いただけます。'
         },
         {
             q: '解体費用に補助金は使えますか？',
@@ -44,9 +44,9 @@ export default function Guide() {
     }, []);
 
     const priceRows = [
-        { structure: '木造', price: '3〜5万円', example: '約90〜150万円' },
-        { structure: '鉄骨造', price: '4〜6万円', example: '約120〜180万円' },
-        { structure: 'RC造(鉄筋コンクリート)', price: '6〜8万円', example: '約180〜240万円' }
+        { structure: '木造', price: '4〜6万円', example: '約120〜180万円' },
+        { structure: '鉄骨造', price: '5〜8万円', example: '約150〜240万円' },
+        { structure: 'RC造(鉄筋コンクリート)', price: '7〜10万円', example: '約210〜300万円' }
     ];
 
     const factors = [
@@ -113,8 +113,10 @@ export default function Guide() {
                             </tbody>
                         </table>
                     </div>
-                    <p style={{ fontSize: '0.85rem', color: '#888', marginTop: '15px' }}>
-                        ※ 上記は一般的な目安です。立地条件・付帯工事・残置物の量などにより変動します。正確な金額は無料見積もりでご確認ください。
+                    <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '15px', lineHeight: 1.8 }}>
+                        ※ 金額は目安となります。<br />
+                        対象建物の構造や施工条件により変動いたします。<br />
+                        まずはお気軽にご相談ください。
                     </p>
                 </div>
             </section>

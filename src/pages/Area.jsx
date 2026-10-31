@@ -38,9 +38,9 @@ export default function Area() {
     }
 
     const priceRows = [
-        { structure: '木造', price: '3〜5万円', example: '約90〜150万円' },
-        { structure: '鉄骨造', price: '4〜6万円', example: '約120〜180万円' },
-        { structure: 'RC造(鉄筋コンクリート)', price: '6〜8万円', example: '約180〜240万円' }
+        { structure: '木造', price: '4〜6万円', example: '約120〜180万円' },
+        { structure: '鉄骨造', price: '5〜8万円', example: '約150〜240万円' },
+        { structure: 'RC造(鉄筋コンクリート)', price: '7〜10万円', example: '約210〜300万円' }
     ];
 
     const others = areas.filter((a) => a.slug !== slug);
@@ -109,8 +109,10 @@ export default function Area() {
                             </tbody>
                         </table>
                     </div>
-                    <p style={{ fontSize: '0.85rem', color: '#888', marginTop: '15px' }}>
-                        ※ 一般的な目安です。前面道路の広さ、付帯物、残置物の量などで変動します。
+                    <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '15px', lineHeight: 1.8 }}>
+                        ※ 金額は目安となります。<br />
+                        対象建物の構造や施工条件により変動いたします。<br />
+                        まずはお気軽にご相談ください。<br />
                         費用が変わる条件は<Link to="/guide" style={{ color: 'var(--color-primary, #2c5f7a)' }}>解体費用・補助金ガイド</Link>で詳しく解説しています。
                     </p>
                 </div>
