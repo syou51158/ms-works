@@ -28,13 +28,31 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
 
-      - name: 🚀 Deploy via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SFTP_SERVER }}
-          username: ${{ secrets.SFTP_USERNAME }}
-          password: ${{ secrets.SFTP_PASSWORD }}
-          port: 2222
-          source: "dist/*"
-          target: "web/ms-works-kyoto"
-          strip_components: 1
+      - name: 🔑 Install SSH client
+        run: |
+          if ! command -v sshpass >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends sshpass
+          fi
+
+      - name: 🚀 Deploy via SSH
+        shell: bash
+        env:
+          SFTP_SERVER: ${{ secrets.SFTP_SERVER }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SSHPASS: ${{ secrets.SFTP_PASSWORD }}
+        run: |
+          set -euo pipefail
+          # Stream the build (including .htaccess) through one SSH connection.
+          # Keep existing remote files; do not remove the site's directory.
+          tar -czf - -C dist . | sshpass -e ssh \
+            -T -p 2222 \
+            -o ConnectTimeout=30 \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=3 \
+            -o PreferredAuthentications=password \
+            -o PubkeyAuthentication=no \
+            -o StrictHostKeyChecking=accept-new \
+            -o UserKnownHostsFile="$RUNNER_TEMP/ms-works-known-hosts" \
+            "${SFTP_USERNAME}@${SFTP_SERVER}" \
+            'mkdir -p web/ms-works-kyoto && tar -xzf - -C web/ms-works-kyoto'

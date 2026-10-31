@@ -8,7 +8,7 @@ GitHub Actions([.github/workflows/deploy.yml](.github/workflows/deploy.yml))が�
 
 1. `npm ci` で依存関係をインストール
 2. `npm run build` で本番ビルド(Supabaseの接続情報はGitHub Secretsから注入)
-3. ビルド成果物(`dist/`)をロリポップサーバーの `web/ms-works-kyoto` へSCP転送(ポート2222)
+3. ビルド成果物(`dist/`、`.htaccess`を含む)を、OpenSSHの単一接続(ポート2222)でロリポップサーバーの `web/ms-works-kyoto` へ転送・展開
 
 デプロイ状況は [GitHub Actions](https://github.com/syou51158/ms-works/actions) で確認できます。push から数分で本番サイト(https://www.ms-works-kyoto.co.jp/)に反映されます。
 
