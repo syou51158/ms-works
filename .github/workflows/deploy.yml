@@ -1,20 +1,41 @@
 name: Deploy to Lolipop FTP
 
+# main に入った変更を本番サーバー（ロリポップ）へ自動で公開する。
+#
+# 安全のため2段に分けている:
+#   1. build  … リポジトリのコードを動かしてサイトを組み立てる。サーバーのパスワードは渡さない
+#   2. deploy … 組み立てた結果を点検し、表示用のファイル（HTML・CSS・JS・画像など）だけをサーバーへ送る。
+#               ここではリポジトリのコードを一切動かさない（パスワードを守るため）
+#
+# サーバーのパスワード（SFTP_*）は GitHub の Environment「production」にだけ置き、main からしか使えない。
+# このファイルを含む .github/ の変更は、GitHub オーナーの承認が無いと main に入らない（.github/CODEOWNERS）。
+# 点検の中身は ci.yml の「Check files」と同じにしておくこと。
+
 on:
   push:
     branches:
       - main
-  # Actions 画面の「Run workflow」から手動で再デプロイできるようにする
-  # (GitHub Secrets を更新したあとなど、コードを変えずに公開し直したいとき用)
+  # Actions 画面の「Run workflow」から手動で再デプロイできる
+  # (GitHub Secrets を更新したあとなど、コードを変えずに公開し直したいとき用。ブランチは main を選ぶ)
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+# 公開が重ならないように、1つずつ順番に実行する
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 jobs:
-  web-deploy:
-    name: 🎉 Deploy
+  build:
+    name: 🏗️ Build
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
@@ -30,6 +51,72 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
+
+      - name: 📤 Save build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist
+          path: dist/
+          include-hidden-files: true   # .htaccess を含める
+          if-no-files-found: error
+          retention-days: 3
+
+  deploy:
+    name: 🎉 Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: 📥 Get build output
+        uses: actions/download-artifact@v4
+        with:
+          name: site-dist
+          path: dist
+
+      - name: 🔍 Check files before sending
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd dist
+
+          test -f index.html || { echo "::error::index.html がありません。組み立てに失敗しています。"; exit 1; }
+
+          # 1) シンボリックリンクは送らない
+          if [ -n "$(find . -type l -print -quit)" ]; then
+            echo "::error::シンボリックリンクは送れません。"
+            find . -type l
+            exit 1
+          fi
+
+          # 2) .htaccess はトップの1つだけで、中身は登録したものと同じであること
+          #    （変える必要があるときは、GitHub オーナーがこの値を新しい中身の sha256 に更新する）
+          EXPECTED_HTACCESS_SHA256="c717ccca6bbd7f3b17f49805b8895fd2fbc5f67fe42cb86afe704f40d310f258"
+          actual="$(sha256sum .htaccess | cut -d' ' -f1)"
+          if [ "$actual" != "$EXPECTED_HTACCESS_SHA256" ]; then
+            echo "::error::.htaccess の中身が登録されたものと違います。変える必要があるときは、GitHub オーナー（制作担当）に依頼してください。"
+            exit 1
+          fi
+
+          # 3) 「.」で始まるファイル・フォルダは送らない（トップの .htaccess を除く）
+          dot="$(find . -mindepth 1 -name '.*' ! -path './.htaccess' -print)"
+          if [ -n "$dot" ]; then
+            echo "::error::「.」で始まるファイル・フォルダは送れません。"
+            echo "$dot"
+            exit 1
+          fi
+
+          # 4) 表示用のファイルだけ送る。PHP などサーバー上で動くファイルは、名前の途中に入っていても送らない
+          bad="$(find . -type f ! -path './.htaccess' -print \
+            | grep -viE '\.(html|htm|css|js|mjs|json|xml|txt|map|ico|png|jpe?g|gif|webp|avif|svg|woff2?|ttf|otf|eot|mp4|webm|pdf|webmanifest)$' || true)"
+          risky="$(find . -type f ! -path './.htaccess' -print \
+            | grep -iE '\.(php[0-9]*|phtml|phar|pht|phps|cgi|fcgi|pl|py|rb|sh|shtml|shtm|stm|asp|aspx|jsp|htaccess|htpasswd|ini)(\.|$)' || true)"
+          if [ -n "$bad$risky" ]; then
+            echo "::error::送れない種類のファイルがあります（サーバー上で動くファイルや、表示用でないファイルは送れません）。"
+            printf '%s\n' "$bad" "$risky" | sed '/^$/d' | sort -u
+            exit 1
+          fi
+
+          echo "OK: $(find . -type f | wc -l) files, $(du -sh . | cut -f1)"
 
       - name: 🔑 Install SSH client
         run: |

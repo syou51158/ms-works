@@ -1,9 +1,13 @@
 name: Build check
 
 # PR を出すと自動で実行される公開前チェック。
-# 本番の接続情報は使わず、ビルドが通るかと、秘密情報が混ざっていないかだけを確認する。
+# 本番の接続情報は使わず、ビルドが通るか、秘密情報が混ざっていないか、
+# 本番に送れるファイルだけでできているか（deploy.yml の点検と同じ）を確認する。
 on:
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -12,6 +16,8 @@ jobs:
     steps:
       - name: 🚚 Get code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: 🔐 Check for committed secrets
         run: |
@@ -43,3 +49,42 @@ jobs:
           test -f dist/.htaccess || { echo "::error::public/.htaccess が見つかりません（消すとトップ以外のページが404になります）"; exit 1; }
           test -f dist/robots.txt
           test -f dist/sitemap.xml
+
+      - name: 🔍 Check files (same as deploy)
+        shell: bash
+        run: |
+          # deploy.yml の「Check files before sending」と同じ点検。ここで赤くなる変更は、公開しても本番に送られない
+          set -euo pipefail
+          cd dist
+
+          if [ -n "$(find . -type l -print -quit)" ]; then
+            echo "::error::シンボリックリンクは送れません。"
+            find . -type l
+            exit 1
+          fi
+
+          EXPECTED_HTACCESS_SHA256="c717ccca6bbd7f3b17f49805b8895fd2fbc5f67fe42cb86afe704f40d310f258"
+          actual="$(sha256sum .htaccess | cut -d' ' -f1)"
+          if [ "$actual" != "$EXPECTED_HTACCESS_SHA256" ]; then
+            echo "::error::public/.htaccess の中身が登録されたものと違います。このままでは公開できません。変える必要があるときは、GitHub オーナー（制作担当）に依頼してください。"
+            exit 1
+          fi
+
+          dot="$(find . -mindepth 1 -name '.*' ! -path './.htaccess' -print)"
+          if [ -n "$dot" ]; then
+            echo "::error::「.」で始まるファイル・フォルダは本番に送れません。"
+            echo "$dot"
+            exit 1
+          fi
+
+          bad="$(find . -type f ! -path './.htaccess' -print \
+            | grep -viE '\.(html|htm|css|js|mjs|json|xml|txt|map|ico|png|jpe?g|gif|webp|avif|svg|woff2?|ttf|otf|eot|mp4|webm|pdf|webmanifest)$' || true)"
+          risky="$(find . -type f ! -path './.htaccess' -print \
+            | grep -iE '\.(php[0-9]*|phtml|phar|pht|phps|cgi|fcgi|pl|py|rb|sh|shtml|shtm|stm|asp|aspx|jsp|htaccess|htpasswd|ini)(\.|$)' || true)"
+          if [ -n "$bad$risky" ]; then
+            echo "::error::本番に送れない種類のファイルがあります（サーバー上で動くファイルや、表示用でないファイルは送れません）。"
+            printf '%s\n' "$bad" "$risky" | sed '/^$/d' | sort -u
+            exit 1
+          fi
+
+          echo "OK: $(find . -type f | wc -l) files"

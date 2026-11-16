@@ -1,0 +1,4 @@
+# .github/（自動公開の仕組み・PRのチェック・このファイル）の変更は、
+# GitHub オーナー（制作担当）の承認が無いと main に入らない。
+# main のルールセットの「Require review from Code Owners」と組み合わせて働く。
+/.github/ @syou51158
