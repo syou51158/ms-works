@@ -111,7 +111,20 @@
   - 環境変数 `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` があれば本物のデータで表示される。無ければダミーでビルドし、お知らせ・施工実績は空になる（異常ではない）
 - ローカルでの起動: `npm run dev`（`.env.local` に上の2つの環境変数を入れる。`.env.example` 参照）
 
-## 9. やってはいけないこと
+## 9. 引き継ぎ時点で残っているセキュリティの課題
+
+過去に Supabase の `service_role` キー（全権限）と info@ のメールパスワードがリポジトリに書かれていた。ファイルからは削除済みだが Git の履歴に残っており、リポジトリが公開されていたため、漏れたものとして扱う。**初回の点検で未対応なら、最初に依頼者に伝えて一緒に進める。**
+
+1. Supabase のキーの切り替え（順番を守る。先に旧キーを無効にするとサイトのデータ表示とフォームが止まる）
+   1. Supabase の Project Settings → API Keys で公開用キー（`sb_publishable_…`）を確認する
+   2. GitHub オーナーに、GitHub Secrets の `VITE_SUPABASE_ANON_KEY` をそのキーに更新して、Actions の「Run workflow」で再デプロイしてもらう
+   3. 本番サイトが新しいキーで動くこと、見積もりメール（Edge Function `send-estimate-mail`）が動くことを確認する（新しいキーでは関数の JWT 検証の設定変更が必要な場合がある）
+   4. Supabase の API Keys で、Legacy API Keys（JWT-based）を無効にする
+2. ロリポップで info@ のパスワードを変更し、Supabase の Edge Function の Secrets `SMTP_PASS` を同じ値に更新する。見積もりフォームからテスト送信して確認する
+3. Supabase の Authentication の設定で、新規ユーザー登録（Allow new users to sign up）をオフにする（`/admin/secret-signup` 対策）
+4. GitHub リポジトリを非公開にする（GitHub オーナーの作業）
+
+## 10. やってはいけないこと
 
 - `main` への直接 push、強制 push（`--force`）
 - `.github/workflows/` の変更（必要なら理由を説明し、依頼者と GitHub オーナーの了承を得る）
