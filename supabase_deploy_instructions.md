@@ -19,7 +19,7 @@
 | `SMTP_HOST` | `smtp.lolipop.jp` |
 | `SMTP_PORT` | `465` |
 | `SMTP_USER` | `info@ms-works-kyoto.co.jp` |
-| `SMTP_PASS` | `Miyamoto123--` |
+| `SMTP_PASS` | (メールアカウントのパスワード。リポジトリには書かず、Supabaseダッシュボードで直接設定) |
 | `MAIL_FROM` | `info@ms-works-kyoto.co.jp` |
 
 ## 3. 確認事項
