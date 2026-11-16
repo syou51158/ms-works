@@ -12,6 +12,9 @@ GitHub Actions([.github/workflows/deploy.yml](.github/workflows/deploy.yml))が�
 
 デプロイ状況は [GitHub Actions](https://github.com/syou51158/ms-works/actions) で確認できます。push から数分で本番サイト(https://www.ms-works-kyoto.co.jp/)に反映されます。
 
+- コードを変えずに公開し直したいとき(GitHub Secrets を更新したあとなど)は、Actions の「Deploy to Lolipop FTP」→「Run workflow」で手動実行できます。
+- PR を出すと「Build check」([.github/workflows/ci.yml](.github/workflows/ci.yml))が、ビルドが通るか・APIキーが混ざっていないか・`.htaccess` などの必須ファイルがあるかを自動で確認します。
+
 ### 必要なGitHub Secrets
 
 | Secret | 内容 |

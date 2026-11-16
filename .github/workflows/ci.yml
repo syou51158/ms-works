@@ -1,0 +1,45 @@
+name: Build check
+
+# PR を出すと自動で実行される公開前チェック。
+# 本番の接続情報は使わず、ビルドが通るかと、秘密情報が混ざっていないかだけを確認する。
+on:
+  pull_request:
+
+jobs:
+  build:
+    name: 🏗️ Build check
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Check for committed secrets
+        run: |
+          # Supabase の JWT 形式のキー / secret キーがファイルに書かれていたら失敗させる
+          if git grep -nIE 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.|sb_secret_' -- . ':!package-lock.json' ':!.github/workflows/ci.yml'; then
+            echo "::error::APIキーらしき文字列がファイルに含まれています。キーはファイルに書かず、GitHub Secrets や環境変数で渡してください。"
+            exit 1
+          fi
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build
+        env:
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_ANON_KEY: build-check-placeholder
+        run: npm run build
+
+      - name: ✅ Check required files
+        run: |
+          # 消えると本番で問題になるファイル
+          test -f dist/index.html
+          test -f dist/.htaccess || { echo "::error::public/.htaccess が見つかりません（消すとトップ以外のページが404になります）"; exit 1; }
+          test -f dist/robots.txt
+          test -f dist/sitemap.xml

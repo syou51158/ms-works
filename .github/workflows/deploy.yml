@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  # Actions 画面の「Run workflow」から手動で再デプロイできるようにする
+  # (GitHub Secrets を更新したあとなど、コードを変えずに公開し直したいとき用)
+  workflow_dispatch:
 
 jobs:
   web-deploy:
