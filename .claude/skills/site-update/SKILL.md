@@ -33,6 +33,7 @@ git switch -c <作業ブランチ名> origin/main   # 例: update/top-message（
   5. `public/sitemap.xml` に URL
 - 画像を追加するとき: `public/images/` に半角英数字のファイル名で置き、`/images/ファイル名` で参照。大きければ縮小する（`convert 元.jpg -resize '1600x1600>' -quality 80 public/images/新.jpg`）。依頼者から画像ファイルを受け取れない場合は、管理画面か GitHub の画面からアップロードしてもらう方法を案内する
 - 既存の書き方（インラインの style、Tailwind のクラス、色の変数）に合わせる。関係ない箇所は直さない
+- `.github/`（公開の仕組み）と `public/.htaccess` は触らない。PHP などサーバー上で動くファイルも追加しない（公開時の点検で止まる）。必要なら理由を依頼者に説明し、GitHub オーナー（制作担当）に依頼してもらう
 
 ## 4. 確認する
 
@@ -55,7 +56,7 @@ git commit -m "トップページのキャッチコピーを変更"
 git push -u origin <作業ブランチ名>
 ```
 
-PR は日本語で作る。本文の例:
+PR は日本語で作る（`gh pr create` が使えない環境では、使える GitHub のツールか `gh api` の REST で作る）。本文の例:
 
 ```
 ## 変更内容

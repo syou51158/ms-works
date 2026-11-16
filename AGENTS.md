@@ -29,6 +29,7 @@
 | 「公開して」「元に戻して」 | マージ → デプロイ確認 → 本番確認 / 取り消しの PR | `.claude/skills/publish/SKILL.md` |
 | 施工実績・お知らせ・SEO設定の追加や修正 | 管理画面 or データベース（コード修正は不要） | `.claude/skills/works-news/SKILL.md` |
 | 「ちゃんと動いてる？」「点検して」、環境の確認 | 点検 | `.claude/skills/site-check/SKILL.md` |
+| 公開の仕組み（`.github/`）の変更 | **AI と依頼者だけでは公開できない**。理由を説明して PR を作り、GitHub オーナーの承認を待つ（承認が無いとマージできない） | — |
 | サーバー・ドメイン・メール・GitHub の設定やパスワード | **AI ではできない**。制作担当（GitHub オーナー）か Supabase オーナーに依頼してもらう | — |
 
 手順書（`.claude/skills/*/SKILL.md`）は Claude 以外の AI も読んで従ってよい。
@@ -42,18 +43,25 @@
 3. `npm run build` が成功することを確認する
 4. `node scripts/screenshot.cjs <変更したページのパス…>` で PC・スマホの画像を撮り、自分で見て崩れがないか確認してから依頼者に見せる
 5. PR を作る（日本語で、何が変わるか・確認したこと・公開への影響を書く）
-6. 依頼者が「公開して」と言ったら `main` にマージする
+6. 依頼者が「公開して」と言ったら `main` にマージする（PR の自動チェック「Build check」が緑であること。`.github/` の変更を含む PR は、GitHub オーナーの承認が無いとマージできない）
 7. GitHub Actions の「Deploy to Lolipop FTP」が成功したか確認する（数分）
 8. 本番サイトで変更を確認し、URL を添えて依頼者に完了を報告する
 
 ## 4. 公開（デプロイ）の仕組み
 
-- `.github/workflows/deploy.yml`: `main` への push で `npm ci` → `npm run build` → SSH（ポート2222）でロリポップの `web/ms-works-kyoto` へ転送・展開
-  - Actions 画面の「Run workflow」から手動で再実行もできる（コードを変えずに再公開したいとき）
-- `.github/workflows/ci.yml`: PR を出すと自動でビルドと秘密情報チェックを行う（「Build check」。緑ならOK）
+- `.github/workflows/deploy.yml`: `main` への push で、次の2段で公開する
+  1. 組み立て（🏗️ Build）: `npm ci` → `npm run build`。サーバーの接続情報はここには渡らない
+  2. 送信（🎉 Deploy）: 組み立てた結果を点検してから、SSH（ポート2222）でロリポップの `web/ms-works-kyoto` へ転送・展開する。この段ではリポジトリのコードを動かさない
+  - 送れるのは表示用のファイルだけ（HTML・CSS・JS・画像・フォント・PDF・動画・xml・txt など）。PHP などサーバー上で動くファイル（`a.php.png` のように名前の途中に入っているものも）、「.」で始まるファイル、中身が登録と違う `.htaccess` が入っていると、送らずに止まる
+  - Actions 画面の「Run workflow」（ブランチは `main`）から手動で再実行もできる（コードを変えずに再公開したいとき）
+- `.github/workflows/ci.yml`: PR を出すと自動でビルド・秘密情報チェック・上と同じファイルの点検を行う（「Build check」。緑ならOK）。`main` のルールで、緑でない PR はマージできない
 - 転送は上書きのみで、サーバー上の古いファイルは消えない
 - 本番を元に戻すときは、問題の変更を `git revert` する PR を作ってマージする（サーバーを直接いじらない）
-- GitHub Secrets（`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` / `SFTP_SERVER` / `SFTP_USERNAME` / `SFTP_PASSWORD`）は GitHub オーナーしか変更できない。デプロイが接続エラーで失敗したら、コードではなくこれらかサーバー側の問題なので、オーナーへの連絡を依頼者に勧める
+- 接続情報の置き場所（どれも GitHub オーナーしか変更できない）:
+  - サーバーの接続情報（`SFTP_SERVER` / `SFTP_USERNAME` / `SFTP_PASSWORD`）は GitHub の Environment「production」にあり、`main` からの公開でしか使えない
+  - Supabase の公開用の値（`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`）はリポジトリの Secrets（どちらもサイトに埋め込まれて公開される値）
+  - デプロイが「Deploy via SSH」で失敗したら、コードではなく接続情報かサーバー側の問題なので、オーナーへの連絡を依頼者に勧める
+- `main` には直接 push できない（PR 経由のみ）。`.github/` 以下（公開の仕組み）の変更は、GitHub オーナーの承認（コードオーナーのレビュー）が無いと `main` に入らない（`.github/CODEOWNERS`）
 - 詳細とチェックリスト: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## 5. ページとファイルの対応
@@ -122,12 +130,13 @@
    4. Supabase の API Keys で、Legacy API Keys（JWT-based）を無効にする
 2. ロリポップで info@ のパスワードを変更し、Supabase の Edge Function の Secrets `SMTP_PASS` を同じ値に更新する。見積もりフォームからテスト送信して確認する
 3. Supabase の Authentication の設定で、新規ユーザー登録（Allow new users to sign up）をオフにする（`/admin/secret-signup` 対策）
-4. GitHub リポジトリを非公開にする（GitHub オーナーの作業）
+4. リポジトリの公開・非公開は GitHub オーナーが判断する。今は公開のまま運用している（1〜2で鍵とパスワードを取り替えれば、履歴に残った値は使えなくなる）。GitHub の無料プランのまま非公開にすると、4章の Environment の接続情報と保護が無効になり、公開も止まる。非公開にするなら、先に GitHub の有料プラン（Pro 以上）が必要
 
 ## 10. やってはいけないこと
 
 - `main` への直接 push、強制 push（`--force`）
-- `.github/workflows/` の変更（必要なら理由を説明し、依頼者と GitHub オーナーの了承を得る）
+- `.github/` の変更（必要なら理由を説明し、依頼者と GitHub オーナーの了承を得る。仕組み上、GitHub オーナーの承認が無いとマージできない）
+- `public/.htaccess` の中身の変更、PHP などサーバー上で動くファイルの追加（公開時の点検で止まる。必要なら GitHub オーナーに依頼してもらう）
 - `public/.htaccess`（消すとトップ以外が404になる）、`public/googleeeb789c57d9261f7.html`（Google Search Console の所有確認）、`public/robots.txt` の削除
 - 秘密情報や個人情報のコミット（コミット前に `git diff --cached` で確認する）
 - 不要な npm パッケージの追加（追加するときは理由を説明する）

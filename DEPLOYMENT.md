@@ -6,9 +6,12 @@
 
 GitHub Actions([.github/workflows/deploy.yml](.github/workflows/deploy.yml))が以下を自動実行します:
 
-1. `npm ci` で依存関係をインストール
-2. `npm run build` で本番ビルド(Supabaseの接続情報はGitHub Secretsから注入)
-3. ビルド成果物(`dist/`、`.htaccess`を含む)を、OpenSSHの単一接続(ポート2222)でロリポップサーバーの `web/ms-works-kyoto` へ転送・展開
+1. 組み立て(🏗️ Build): `npm ci` → `npm run build`(Supabaseの公開用の値はGitHub Secretsから注入)。サーバーの接続情報は渡さない
+2. 送信(🎉 Deploy): ビルド成果物(`dist/`、`.htaccess`を含む)を点検し、OpenSSHの単一接続(ポート2222)でロリポップサーバーの `web/ms-works-kyoto` へ転送・展開。この段ではリポジトリのコードを動かさない
+   - 点検: 表示用のファイル(HTML・CSS・JS・画像・フォント・PDF・動画・xml・txt など)だけを送る。PHP などサーバー上で動くファイル、「.」で始まるファイル、中身が登録と違う `.htaccess` があれば送らずに止まる
+   - `.htaccess` を変える必要があるときは、deploy.yml と ci.yml の `EXPECTED_HTACCESS_SHA256` を新しい中身の sha256 に更新する(GitHub オーナーの作業)
+
+サーバーの接続情報は GitHub の Environment「production」に置き、`main` からの公開でしか使えないようにしている。`main` へは PR 経由でしか入らず、`.github/` の変更は `.github/CODEOWNERS` により GitHub オーナーの承認が必要。
 
 デプロイ状況は [GitHub Actions](https://github.com/syou51158/ms-works/actions) で確認できます。push から数分で本番サイト(https://www.ms-works-kyoto.co.jp/)に反映されます。
 
@@ -17,17 +20,19 @@ GitHub Actions([.github/workflows/deploy.yml](.github/workflows/deploy.yml))が�
 
 ### 必要なGitHub Secrets
 
-| Secret | 内容 |
-|---|---|
-| `VITE_SUPABASE_URL` | SupabaseプロジェクトURL |
-| `VITE_SUPABASE_ANON_KEY` | Supabase anonキー |
-| `SFTP_SERVER` | ロリポップのSFTPサーバー |
-| `SFTP_USERNAME` | SFTPユーザー名 |
-| `SFTP_PASSWORD` | SFTPパスワード |
+| 置き場所 | Secret | 内容 |
+|---|---|---|
+| リポジトリの Secrets | `VITE_SUPABASE_URL` | SupabaseプロジェクトURL |
+| リポジトリの Secrets | `VITE_SUPABASE_ANON_KEY` | Supabaseの公開用キー(anon / publishable) |
+| Environment「production」 | `SFTP_SERVER` | ロリポップのSSHサーバー |
+| Environment「production」 | `SFTP_USERNAME` | SSHユーザー名 |
+| Environment「production」 | `SFTP_PASSWORD` | SSHパスワード |
+
+Environment「production」は、公開できるブランチを `main` だけに絞っている。GitHub の無料プランでは、Environment はリポジトリが公開のときだけ使える(非公開にすると接続情報が無効になり公開が止まる)。
 
 ## 手動デプロイ(緊急時のフォールバック)
 
-GitHub Actionsが使えない場合のみ:
+GitHub Actionsが使えない場合のみ、GitHub オーナー(制作担当)が行う(PHP など表示用以外のファイルは置かない):
 
 1. ローカルで `npm run build` を実行
 2. `dist/` フォルダの中身**すべて**(`.htaccess` 含む)をFTPソフトでロリポップの公開ディレクトリにアップロード
